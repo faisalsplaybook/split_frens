@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../data/dummy_data.dart';
+import '../features/hangouts/presentation/widgets/hangout_card.dart';
 
 /// The main entry screen of the application.
 class HomeScreen extends StatelessWidget {
@@ -7,89 +8,117 @@ class HomeScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // We use a Scaffold to get basic Material Design layout structure (like AppBar, Body, FAB).
     return Scaffold(
       appBar: AppBar(
-        // The title of the app
+        // App name
         title: const Text(
           'SplitFrens',
           style: TextStyle(fontWeight: FontWeight.bold),
         ),
         centerTitle: true,
+        // Settings icon on the top right
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.settings),
+            onPressed: () {
+              // Action to go to settings
+            },
+          ),
+        ],
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
           children: [
-            // ==========================================
-            // Tagline
-            // ==========================================
-            Text(
-              'Split trips. Settle fast.',
-              style: TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.bold,
-                color: Colors.grey.shade700,
-              ),
-              textAlign: TextAlign.center,
+            // The Expanded widget makes this section take up all available space
+            // pushing the buttons at the bottom down.
+            Expanded(
+              child: DummyData.allHangouts.isEmpty
+                  ? _buildEmptyState(context)
+                  : _buildRecentHangouts(context),
             ),
-            const SizedBox(height: 24), // Spacing
-            // ==========================================
-            // Section Title
-            // ==========================================
-            const SizedBox(
-              width: double.infinity, // Forces the widget to take full width
-              child: Text(
-                'Your Hangouts',
-                textAlign: TextAlign.left,
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-              ),
-            ),
-            const SizedBox(height: 12),
 
             // ==========================================
-            // Dummy Hangout Card
+            // Call to Actions (CTAs) at the bottom
             // ==========================================
-            // We use our dummy data to populate the card
-            Card(
-              child: ListTile(
-                contentPadding: const EdgeInsets.symmetric(
-                  horizontal: 16,
-                  vertical: 8,
-                ),
-                leading: CircleAvatar(
-                  backgroundColor: Theme.of(
-                    context,
-                  ).colorScheme.primaryContainer,
-                  child: const Icon(Icons.local_dining),
-                ),
-                title: Text(
-                  DummyData.fridayKacchiNight.title,
-                  style: const TextStyle(fontWeight: FontWeight.bold),
-                ),
-                subtitle: Text(
-                  // Show the number of participants
-                  '${DummyData.fridayKacchiNight.participantIds.length} people • ${DummyData.fridayKacchiNight.expenseIds.length} expenses',
-                ),
-                trailing: const Icon(Icons.chevron_right),
-                onTap: () {
-                  // In the future, this will navigate to the hangout details
+            const SizedBox(height: 16),
+
+            // Primary CTA
+            SizedBox(
+              width: double.infinity, // Make the button take full width
+              child: ElevatedButton(
+                onPressed: () {
+                  // Logic to create a hangout
                 },
+                child: const Text('Create Hangout'),
               ),
             ),
+
+            const SizedBox(height: 12),
+
+            // Secondary CTA
+            SizedBox(
+              width: double.infinity,
+              child: OutlinedButton(
+                onPressed: () {
+                  // Logic to view history
+                },
+                child: const Text('View History'),
+              ),
+            ),
+            const SizedBox(height: 16), // A little padding at the very bottom
           ],
         ),
       ),
-      // ==========================================
-      // Create Hangout Button
-      // ==========================================
-      floatingActionButton: FloatingActionButton.extended(
-        onPressed: () {
-          // Action for creating a new hangout (to be implemented)
-        },
-        icon: const Icon(Icons.add),
-        label: const Text('Create Hangout'),
+    );
+  }
+
+  /// Builds the view shown when there are NO hangouts
+  Widget _buildEmptyState(BuildContext context) {
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Icon(Icons.flight_takeoff, size: 64, color: Colors.grey.shade400),
+          const SizedBox(height: 16),
+          const Text(
+            'No hangouts yet.',
+            style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+          ),
+          const SizedBox(height: 8),
+          Text(
+            'Create your first hangout.',
+            style: TextStyle(fontSize: 14, color: Colors.grey.shade600),
+          ),
+        ],
       ),
+    );
+  }
+
+  /// Builds the view shown when there ARE recent hangouts
+  Widget _buildRecentHangouts(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        // Section Title
+        const Text(
+          'Your Hangouts',
+          style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+        ),
+        const SizedBox(height: 12),
+
+        // List of hangout cards
+        // We use ListView.builder for scrollable lists
+        Expanded(
+          child: ListView.builder(
+            itemCount: DummyData.allHangouts.length,
+            itemBuilder: (context, index) {
+              final hangout = DummyData.allHangouts[index];
+              return HangoutCard(hangout: hangout);
+            },
+          ),
+        ),
+      ],
     );
   }
 }

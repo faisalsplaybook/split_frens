@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 // 1. Import our newly created theme file
 import 'core/theme/app_theme.dart';
-// Import our new home screen
-import 'screens/home_screen.dart';
+// Import our new Splash Screen
+import 'features/splash/presentation/screens/splash_screen.dart';
 
 void main() {
   // runApp is the starting point of any Flutter app.
@@ -24,8 +24,8 @@ class MyApp extends StatelessWidget {
       // all the colors and shapes we defined in AppTheme.lightTheme.
       theme: AppTheme.lightTheme,
 
-      // We removed the default MyHomePage and replaced it with our custom HomeScreen
-      home: const HomeScreen(),
+      // We set the SplashScreen as the very first screen of our app.
+      home: const SplashScreen(),
 
       // Hides the "DEBUG" banner in the top right corner
       debugShowCheckedModeBanner: false,
