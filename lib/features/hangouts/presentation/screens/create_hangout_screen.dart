@@ -4,22 +4,25 @@ import '../../../../shared/widgets/app_dropdown.dart';
 import '../../../../core/utils/validators.dart';
 import 'package:go_router/go_router.dart';
 import 'package:uuid/uuid.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../models/hangout_model.dart';
-import '../../../../data/dummy_data.dart';
+import '../providers/hangout_provider.dart';
 
 // ==========================================
 // Create Hangout Screen
 // ==========================================
 // We changed this to a StatefulWidget because we need to remember the state
 // of our form (what the user typed, if travel mode is toggled on, etc).
-class CreateHangoutScreen extends StatefulWidget {
+// We changed this to a ConsumerStatefulWidget because we need to remember the state
+// of our form AND we need access to Riverpod providers!
+class CreateHangoutScreen extends ConsumerStatefulWidget {
   const CreateHangoutScreen({super.key});
 
   @override
-  State<CreateHangoutScreen> createState() => _CreateHangoutScreenState();
+  ConsumerState<CreateHangoutScreen> createState() => _CreateHangoutScreenState();
 }
 
-class _CreateHangoutScreenState extends State<CreateHangoutScreen> {
+class _CreateHangoutScreenState extends ConsumerState<CreateHangoutScreen> {
   // 1. The Form Key
   // This is a unique key that identifies our form. We use it later to trigger
   // the validation check when the user presses 'Save'.
@@ -64,8 +67,10 @@ class _CreateHangoutScreenState extends State<CreateHangoutScreen> {
         expenseIds: [],
       );
 
-      // 3. Add it to our local "database" (DummyData) so it shows up on the Home screen
-      DummyData.allHangouts.add(newHangout);
+      // 3. Add it to our central state (Riverpod) instead of the local DummyData list!
+      // We use ref.read instead of ref.watch because we are inside a button press (an event), 
+      // not inside the build() method.
+      ref.read(hangoutsProvider.notifier).createHangout(newHangout);
 
       // 4. Show visual feedback to the user
       ScaffoldMessenger.of(

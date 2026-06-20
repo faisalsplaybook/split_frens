@@ -1,14 +1,18 @@
 import 'package:flutter/material.dart';
-import '../data/dummy_data.dart';
 import '../features/hangouts/presentation/widgets/hangout_card.dart';
 import 'package:go_router/go_router.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../features/hangouts/presentation/providers/hangout_provider.dart';
 
 /// The main entry screen of the application.
-class HomeScreen extends StatelessWidget {
+class HomeScreen extends ConsumerWidget {
   const HomeScreen({super.key});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    // Watch the hangouts provider. If the list changes (e.g. a new one is added),
+    // this entire HomeScreen will automatically redraw!
+    final hangouts = ref.watch(hangoutsProvider);
     return Scaffold(
       appBar: AppBar(
         // App name
@@ -35,9 +39,9 @@ class HomeScreen extends StatelessWidget {
             // The Expanded widget makes this section take up all available space
             // pushing the buttons at the bottom down.
             Expanded(
-              child: DummyData.allHangouts.isEmpty
+              child: hangouts.isEmpty
                   ? _buildEmptyState(context)
-                  : _buildRecentHangouts(context),
+                  : _buildRecentHangouts(context, hangouts),
             ),
 
             // ==========================================
@@ -100,7 +104,7 @@ class HomeScreen extends StatelessWidget {
   }
 
   /// Builds the view shown when there ARE recent hangouts
-  Widget _buildRecentHangouts(BuildContext context) {
+  Widget _buildRecentHangouts(BuildContext context, List<dynamic> hangouts) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -115,9 +119,9 @@ class HomeScreen extends StatelessWidget {
         // We use ListView.builder for scrollable lists
         Expanded(
           child: ListView.builder(
-            itemCount: DummyData.allHangouts.length,
+            itemCount: hangouts.length,
             itemBuilder: (context, index) {
-              final hangout = DummyData.allHangouts[index];
+              final hangout = hangouts[index];
               return HangoutCard(hangout: hangout);
             },
           ),

@@ -1,21 +1,64 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../providers/hangout_provider.dart';
+import '../../../../models/hangout_model.dart';
 
 // ==========================================
 // Hangout Detail Screen
 // ==========================================
 // This is the main hub for a specific hangout. From here, you can add people,
 // add expenses, view results, and see settlements.
-class HangoutDetailScreen extends StatelessWidget {
+class HangoutDetailScreen extends ConsumerWidget {
   final String hangoutId;
 
   const HangoutDetailScreen({super.key, required this.hangoutId});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    // 1. Get the list of all hangouts from our Riverpod provider
+    final hangouts = ref.watch(hangoutsProvider);
+
+    // 2. Try to find the specific hangout for this screen
+    // We use a simple loop or firstWhere to find it safely
+    HangoutModel? hangout;
+    try {
+      hangout = hangouts.firstWhere((h) => h.id == hangoutId);
+    } catch (e) {
+      hangout = null; // firstWhere throws an error if no match is found
+    }
+
+    // 3. Error State (If the hangout doesn't exist)
+    if (hangout == null) {
+      return Scaffold(
+        appBar: AppBar(title: const Text('Error')),
+        body: Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              const Icon(Icons.error_outline, size: 64, color: Colors.red),
+              const SizedBox(height: 16),
+              const Text(
+                'Hangout not found.',
+                style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+              ),
+              const SizedBox(height: 24),
+              ElevatedButton.icon(
+                onPressed: () => context.go('/'),
+                icon: const Icon(Icons.home),
+                label: const Text('Back to Home'),
+              ),
+            ],
+          ),
+        ),
+      );
+    }
+
+    // 4. Normal State (If the hangout exists)
     return Scaffold(
       appBar: AppBar(
-        title: Text('Hangout: $hangoutId'),
+        // We use the actual title of the hangout instead of the raw ID!
+        title: Text(hangout.title),
         actions: [
           // Share Summary Action
           IconButton(
