@@ -1,26 +1,200 @@
 import 'package:flutter/material.dart';
+import '../../../../shared/widgets/app_text_field.dart';
+import '../../../../shared/widgets/app_dropdown.dart';
+import '../../../../core/utils/validators.dart';
+import 'package:go_router/go_router.dart';
+import 'package:uuid/uuid.dart';
+import '../../../../models/hangout_model.dart';
+import '../../../../data/dummy_data.dart';
 
 // ==========================================
 // Create Hangout Screen
 // ==========================================
-// This is a StatelessWidget because a placeholder screen doesn't 
-// need to manage any complex changing data (state) yet.
-class CreateHangoutScreen extends StatelessWidget {
+// We changed this to a StatefulWidget because we need to remember the state
+// of our form (what the user typed, if travel mode is toggled on, etc).
+class CreateHangoutScreen extends StatefulWidget {
   const CreateHangoutScreen({super.key});
 
   @override
+  State<CreateHangoutScreen> createState() => _CreateHangoutScreenState();
+}
+
+class _CreateHangoutScreenState extends State<CreateHangoutScreen> {
+  // 1. The Form Key
+  // This is a unique key that identifies our form. We use it later to trigger
+  // the validation check when the user presses 'Save'.
+  final _formKey = GlobalKey<FormState>();
+
+  // 2. Controllers
+  // Controllers allow us to read the text the user has typed into the TextFields.
+  final _nameController = TextEditingController();
+  final _noteController = TextEditingController();
+
+  // 3. State Variables
+  // Variables to hold the dropdown and toggle selections
+  String _selectedType = 'Hangout';
+  bool _isTravelMode = false;
+  String? _selectedCurrency;
+
+  @override
+  void dispose() {
+    // Always dispose controllers when the screen is destroyed to free up memory!
+    _nameController.dispose();
+    _noteController.dispose();
+    super.dispose();
+  }
+
+  // This function is called when the user presses the 'Create' button
+  void _submitForm() {
+    // _formKey.currentState!.validate() goes through every field in our Form
+    // and runs the validator functions we gave them.
+    if (_formKey.currentState!.validate()) {
+      // If validate() returns true, all fields passed!
+
+      // 1. Create a unique ID for our new hangout using the uuid package
+      final newId = const Uuid().v4();
+
+      // 2. Create the Hangout object
+      final newHangout = HangoutModel(
+        id: newId,
+        title: _nameController.text.trim(),
+        startDate: DateTime.now(), // For now, we just use today's date
+        // As requested for Day 4: keep people and expenses empty!
+        participantIds: [],
+        expenseIds: [],
+      );
+
+      // 3. Add it to our local "database" (DummyData) so it shows up on the Home screen
+      DummyData.allHangouts.add(newHangout);
+
+      // 4. Show visual feedback to the user
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('Hangout created!')));
+
+      // 5. Navigate to the new Hangout's Detail Screen.
+      // We use pushReplacement so that if the user hits the back button,
+      // it takes them to the Home screen, NOT back to this form!
+      context.pushReplacement('/hangout/$newId');
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
-    // Scaffold provides the basic structural framework for a screen.
-    // It gives us standard things like an AppBar at the top and a body.
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Create Hangout'),
-      ),
-      // Center widget aligns its child exactly in the middle of the screen.
-      body: const Center(
-        child: Text(
-          'We will build the Create Hangout form here!',
-          style: TextStyle(fontSize: 18),
+      appBar: AppBar(title: const Text('Create Hangout')),
+      // We use SingleChildScrollView so the screen can scroll if the keyboard pops up
+      body: SingleChildScrollView(
+        padding: const EdgeInsets.all(16.0),
+        // The Form widget wraps all our inputs and links them to the _formKey
+        child: Form(
+          key: _formKey,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // ==========================================
+              // 1. Hangout Name (Required)
+              // ==========================================
+              AppTextField(
+                label: 'Hangout Name',
+                hint: 'e.g., Weekend Getaway',
+                controller: _nameController,
+                // We use our custom validator here!
+                validator: AppValidators.validateHangoutName,
+              ),
+
+              // ==========================================
+              // 2. Optional Note
+              // ==========================================
+              AppTextField(
+                label: 'Note (Optional)',
+                hint: 'Any details to remember?',
+                controller: _noteController,
+                maxLines: 3, // Makes the box bigger for longer text
+                // No validator needed since it's optional
+              ),
+
+              // ==========================================
+              // 3. Type Dropdown
+              // ==========================================
+              AppDropdown<String>(
+                label: 'Type',
+                value: _selectedType,
+                items: const [
+                  DropdownMenuItem(value: 'Hangout', child: Text('Hangout')),
+                  DropdownMenuItem(value: 'Trip', child: Text('Trip')),
+                ],
+                onChanged: (value) {
+                  // setState tells Flutter to redraw the screen with the new value
+                  if (value != null) {
+                    setState(() {
+                      _selectedType = value;
+                    });
+                  }
+                },
+              ),
+
+              // ==========================================
+              // 4. Travel Mode Toggle
+              // ==========================================
+              // SwitchListTile is a built-in widget that perfectly combines
+              // text and a toggle switch into one row.
+              SwitchListTile(
+                title: const Text('Enable Travel Mode'),
+                subtitle: const Text('Allows tracking in foreign currencies'),
+                value: _isTravelMode,
+                // Moves the switch to the left instead of the far right
+                contentPadding: EdgeInsets.zero,
+                onChanged: (value) {
+                  setState(() {
+                    _isTravelMode = value;
+                    // If we turn off travel mode, clear the currency selection
+                    if (!value) {
+                      _selectedCurrency = null;
+                    }
+                  });
+                },
+              ),
+              const SizedBox(height: 16),
+
+              // ==========================================
+              // 5. Base Currency (Conditional)
+              // ==========================================
+              // We only show this Dropdown IF travel mode is true!
+              if (_isTravelMode)
+                AppDropdown<String>(
+                  label: 'Base Currency',
+                  value: _selectedCurrency,
+                  items: const [
+                    DropdownMenuItem(value: 'USD', child: Text('USD (\$)')),
+                    DropdownMenuItem(value: 'EUR', child: Text('EUR (€)')),
+                    DropdownMenuItem(value: 'GBP', child: Text('GBP (£)')),
+                  ],
+                  onChanged: (value) {
+                    setState(() {
+                      _selectedCurrency = value;
+                    });
+                  },
+                  // Validate that they actually picked one!
+                  validator: (value) =>
+                      AppValidators.validateCurrency(value, _isTravelMode),
+                ),
+
+              const SizedBox(height: 32),
+
+              // ==========================================
+              // 6. Submit Button
+              // ==========================================
+              SizedBox(
+                width: double.infinity,
+                height: 50, // Making the button nicely sized
+                child: ElevatedButton(
+                  onPressed: _submitForm,
+                  child: const Text('Create', style: TextStyle(fontSize: 16)),
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );
