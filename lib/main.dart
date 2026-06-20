@@ -1,31 +1,40 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+
 // 1. Import our newly created theme file
 import 'core/theme/app_theme.dart';
-// Import our new Splash Screen
-import 'features/splash/presentation/screens/splash_screen.dart';
+// 2. Import our newly created router
+import 'core/router/app_router.dart';
 
 void main() {
   // runApp is the starting point of any Flutter app.
-  // It takes a widget (MyApp) and makes it the root of the widget tree.
-  runApp(const MyApp());
+  // By wrapping our MyApp with ProviderScope, we enable Riverpod
+  // for the entire application. Without this, providers won't work!
+  runApp(const ProviderScope(child: MyApp()));
 }
 
-class MyApp extends StatelessWidget {
+// 3. We change StatelessWidget to ConsumerWidget.
+// A ConsumerWidget is a Riverpod widget that can "listen" to providers.
+class MyApp extends ConsumerWidget {
   const MyApp({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    // MaterialApp is a wrapper that provides many built-in Material Design features
-    // like navigation, themes, and localization.
-    return MaterialApp(
+  Widget build(BuildContext context, WidgetRef ref) {
+    // 4. We read our router provider here
+    // ref.watch listens to the appRouterProvider and gives us the GoRouter instance.
+    final goRouter = ref.watch(appRouterProvider);
+
+    // 5. Instead of MaterialApp, we use MaterialApp.router
+    // This tells Flutter that we are using an advanced routing system (go_router)
+    // instead of the basic built-in one.
+    return MaterialApp.router(
       title: 'Split Frens',
-      // 2. Apply our custom theme here!
-      // Now, instead of the default Flutter theme, the app will use
-      // all the colors and shapes we defined in AppTheme.lightTheme.
+
+      // Apply our custom theme here!
       theme: AppTheme.lightTheme,
 
-      // We set the SplashScreen as the very first screen of our app.
-      home: const SplashScreen(),
+      // Pass the router configuration to the app
+      routerConfig: goRouter,
 
       // Hides the "DEBUG" banner in the top right corner
       debugShowCheckedModeBanner: false,

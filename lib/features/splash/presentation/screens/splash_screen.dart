@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-// We import the HomeScreen so we can navigate to it.
-// We use relative paths to go up a few folders to reach lib/screens/
-import '../../../../screens/home_screen.dart';
+// Import go_router so we can use context.go() for navigation.
+// This is the ONLY navigation system we should be using in this app.
+import 'package:go_router/go_router.dart';
 
 /// The splash screen is the first screen the user sees when opening the app.
 /// We make it a StatefulWidget because we need to run some code (a delay) as soon as it loads.
@@ -31,14 +31,14 @@ class _SplashScreenState extends State<SplashScreen> {
     // It's a standard Flutter safety check after doing anything asynchronous (like waiting).
     if (!mounted) return;
 
-    // 3. Navigate to the HomeScreen.
-    // We use pushReplacement instead of just push.
-    // This replaces the splash screen in the navigation stack so that if the user
-    // presses the Android back button on the Home Screen, it closes the app
-    // instead of taking them back to the splash screen.
-    Navigator.of(context).pushReplacement(
-      MaterialPageRoute(builder: (context) => const HomeScreen()),
-    );
+    // 3. Navigate to the Home screen using go_router's context.go().
+    //
+    // IMPORTANT: We use context.go('/') NOT context.push('/').
+    // The difference is crucial:
+    //   - context.push() ADDS '/' on top of '/splash', so back button returns to splash.
+    //   - context.go() REPLACES the entire stack with '/', so there is no way to go back.
+    // This is exactly what we want for a splash screen!
+    context.go('/');
   }
 
   @override

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../../../../models/hangout_model.dart';
 import '../../../../core/utils/money_formatter.dart';
 import '../../../../core/utils/date_formatter.dart';
+import 'package:go_router/go_router.dart';
 
 /// A custom widget to display the summary of a Hangout.
 class HangoutCard extends StatelessWidget {
@@ -14,11 +15,11 @@ class HangoutCard extends StatelessWidget {
   Widget build(BuildContext context) {
     // We use our new DateFormatter to format the model's start date
     final String dateStr = DateFormatter.format(hangout.startDate);
-    
+
     // For now, we still hardcode the total to 1380, but we use MoneyFormatter
     // to give it the proper currency symbol and formatting.
     final String totalAmountStr = MoneyFormatter.format(1380.0);
-    
+
     const String settlementStatusStr = 'Unsettled';
 
     return Card(
@@ -26,7 +27,9 @@ class HangoutCard extends StatelessWidget {
       // InkWell gives us that nice Material ripple effect when the card is tapped!
       child: InkWell(
         onTap: () {
-          // Action to view hangout details
+          // Navigate to this specific hangout's detail screen
+          // We use string interpolation to pass the hangout's unique ID into the URL
+          context.push('/hangout/${hangout.id}');
         },
         borderRadius: BorderRadius.circular(
           16,

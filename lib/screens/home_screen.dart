@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../data/dummy_data.dart';
 import '../features/hangouts/presentation/widgets/hangout_card.dart';
+import 'package:go_router/go_router.dart';
 
 /// The main entry screen of the application.
 class HomeScreen extends StatelessWidget {
@@ -21,7 +22,8 @@ class HomeScreen extends StatelessWidget {
           IconButton(
             icon: const Icon(Icons.settings),
             onPressed: () {
-              // Action to go to settings
+              // Navigate to the Settings screen
+              context.push('/settings');
             },
           ),
         ],
@@ -48,7 +50,8 @@ class HomeScreen extends StatelessWidget {
               width: double.infinity, // Make the button take full width
               child: ElevatedButton(
                 onPressed: () {
-                  // Logic to create a hangout
+                  // Navigate to the Create Hangout screen
+                  context.push('/create-hangout');
                 },
                 child: const Text('Create Hangout'),
               ),
@@ -61,7 +64,8 @@ class HomeScreen extends StatelessWidget {
               width: double.infinity,
               child: OutlinedButton(
                 onPressed: () {
-                  // Logic to view history
+                  // Navigate to the History screen
+                  context.push('/history');
                 },
                 child: const Text('View History'),
               ),
