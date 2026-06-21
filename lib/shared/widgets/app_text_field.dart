@@ -13,6 +13,7 @@ class AppTextField extends StatelessWidget {
   final String? Function(String?)? validator;
   final TextInputType keyboardType;
   final int maxLines;
+  final IconData? prefixIcon;
 
   const AppTextField({
     super.key,
@@ -22,6 +23,7 @@ class AppTextField extends StatelessWidget {
     this.validator,
     this.keyboardType = TextInputType.text,
     this.maxLines = 1,
+    this.prefixIcon,
   });
 
   @override
@@ -45,6 +47,7 @@ class AppTextField extends StatelessWidget {
           // filled: true and fillColor gives it a subtle background color
           filled: true,
           fillColor: Colors.grey.shade50,
+          prefixIcon: prefixIcon != null ? Icon(prefixIcon) : null,
         ),
       ),
     );

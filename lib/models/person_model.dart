@@ -5,12 +5,14 @@ class PersonModel {
   final String id;
   final String name;
   final String? avatarUrl; // The '?' means this field is optional (can be null)
+  final String? contactInfo; // Optional phone/email
 
-  // The constructor requires id and name, but avatarUrl is optional.
+  // The constructor requires id and name, but avatarUrl and contactInfo are optional.
   PersonModel({
     required this.id,
     required this.name,
     this.avatarUrl,
+    this.contactInfo,
   });
 
   /// The copyWith method is a standard Dart pattern.
@@ -20,12 +22,14 @@ class PersonModel {
     String? id,
     String? name,
     String? avatarUrl,
+    String? contactInfo,
   }) {
     return PersonModel(
       // If a new 'id' is provided, use it. Otherwise (??), use the existing 'this.id'
       id: id ?? this.id,
       name: name ?? this.name,
       avatarUrl: avatarUrl ?? this.avatarUrl,
+      contactInfo: contactInfo ?? this.contactInfo,
     );
   }
 }
