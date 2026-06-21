@@ -1,4 +1,4 @@
-import 'package:uuid/uuid.dart';
+
 
 import '../models/expense_model.dart';
 import '../models/hangout_model.dart';
@@ -139,14 +139,19 @@ class SplitCalculatorService {
           ? debtorAmount
           : creditorAmount;
 
+      // Deterministic ID: ensures if amount changes, the ID changes and resets paid status
+      final settlementId =
+          '${hangout.id}_${maxDebtorId}_${maxCreditorId}_${settlementAmount.toStringAsFixed(2)}';
+
       // Create the settlement
       settlements.add(
         SettlementModel(
-          id: const Uuid().v4(),
+          id: settlementId,
           payerId: maxDebtorId,
           payeeId: maxCreditorId,
           amount: settlementAmount,
           date: DateTime.now(),
+          isPaid: hangout.paidSettlementIds.contains(settlementId),
         ),
       );
 

@@ -1,4 +1,4 @@
-import 'package:flutter/foundation.dart';
+
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../data/models/hangout_model.dart';
 import '../../../../data/dummy_data.dart';
@@ -115,19 +115,31 @@ class HangoutsNotifier extends Notifier<List<HangoutModel>> {
 
   /// Marks a specific debt/settlement as Paid
   void markSettlementPaid(String hangoutId, String settlementId) {
-    // TODO: Implement when we create the SettlementModel.
-    // Settlements are usually derived from Expenses, or tracked in a separate list.
-    debugPrint(
-      'TODO: Mark settlement $settlementId as paid in Hangout $hangoutId',
-    );
+    state = state.map((hangout) {
+      if (hangout.id == hangoutId) {
+        if (!hangout.paidSettlementIds.contains(settlementId)) {
+          return hangout.copyWith(
+            paidSettlementIds: [...hangout.paidSettlementIds, settlementId],
+          );
+        }
+      }
+      return hangout;
+    }).toList();
   }
 
   /// Marks a specific debt/settlement as Unpaid
   void markSettlementUnpaid(String hangoutId, String settlementId) {
-    // TODO: Implement when we create the SettlementModel.
-    debugPrint(
-      'TODO: Mark settlement $settlementId as unpaid in Hangout $hangoutId',
-    );
+    state = state.map((hangout) {
+      if (hangout.id == hangoutId) {
+        return hangout.copyWith(
+          paidSettlementIds:
+              hangout.paidSettlementIds
+                  .where((id) => id != settlementId)
+                  .toList(),
+        );
+      }
+      return hangout;
+    }).toList();
   }
 }
 

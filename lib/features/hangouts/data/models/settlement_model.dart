@@ -7,6 +7,7 @@ class SettlementModel {
   final String payeeId;
   final double amount;
   final DateTime date;
+  final bool isPaid;
 
   SettlementModel({
     required this.id,
@@ -14,6 +15,7 @@ class SettlementModel {
     required this.payeeId,
     required this.amount,
     required this.date,
+    this.isPaid = false,
   });
 
   SettlementModel copyWith({
@@ -22,6 +24,7 @@ class SettlementModel {
     String? payeeId,
     double? amount,
     DateTime? date,
+    bool? isPaid,
   }) {
     return SettlementModel(
       id: id ?? this.id,
@@ -29,6 +32,7 @@ class SettlementModel {
       payeeId: payeeId ?? this.payeeId,
       amount: amount ?? this.amount,
       date: date ?? this.date,
+      isPaid: isPaid ?? this.isPaid,
     );
   }
 }

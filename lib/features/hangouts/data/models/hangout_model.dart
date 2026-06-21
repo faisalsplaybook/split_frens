@@ -11,6 +11,9 @@ class HangoutModel {
   // All the expenses added to this hangout
   final List<String> expenseIds;
 
+  // The IDs of settlements that have been marked as paid
+  final List<String> paidSettlementIds;
+
   HangoutModel({
     required this.id,
     required this.title,
@@ -18,6 +21,7 @@ class HangoutModel {
     this.endDate,
     required this.participantIds,
     required this.expenseIds,
+    this.paidSettlementIds = const [],
   });
 
   HangoutModel copyWith({
@@ -27,6 +31,7 @@ class HangoutModel {
     DateTime? endDate,
     List<String>? participantIds,
     List<String>? expenseIds,
+    List<String>? paidSettlementIds,
   }) {
     return HangoutModel(
       id: id ?? this.id,
@@ -35,6 +40,7 @@ class HangoutModel {
       endDate: endDate ?? this.endDate,
       participantIds: participantIds ?? this.participantIds,
       expenseIds: expenseIds ?? this.expenseIds,
+      paidSettlementIds: paidSettlementIds ?? this.paidSettlementIds,
     );
   }
 }

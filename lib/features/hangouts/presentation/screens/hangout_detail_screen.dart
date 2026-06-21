@@ -6,6 +6,7 @@ import '../providers/person_provider.dart';
 import '../../data/models/hangout_model.dart';
 import '../../data/models/person_model.dart';
 import '../providers/expense_provider.dart';
+import '../../data/services/split_calculator_service.dart';
 
 // ==========================================
 // Hangout Detail Screen
@@ -19,10 +20,9 @@ class HangoutDetailScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    // 1. Get the list of all hangouts from our Riverpod provider
+    // 1. Get the lists of data
     final hangouts = ref.watch(hangoutsProvider);
-
-    // 2. Try to find the specific hangout for this screen
+    final allExpenses = ref.watch(expensesProvider);
     // We use a simple loop or firstWhere to find it safely
     HangoutModel? hangout;
     try {
@@ -58,6 +58,17 @@ class HangoutDetailScreen extends ConsumerWidget {
     }
 
     // 4. Normal State (If the hangout exists)
+
+    // Calculate Summary Data
+    final calculator = SplitCalculatorService(allExpenses: allExpenses);
+    final totalSpent = calculator.calculateTotalSpent(hangout);
+    final settlements = calculator.generateSettlements(hangout);
+    final unpaidCount = settlements.where((s) => !s.isPaid).length;
+
+    final summaryStatusText = unpaidCount == 0 
+        ? 'Everyone settled' 
+        : '$unpaidCount unpaid settlement${unpaidCount > 1 ? 's' : ''}';
+
     return Scaffold(
       appBar: AppBar(
         // We use the actual title of the hangout instead of the raw ID!
@@ -116,6 +127,69 @@ class HangoutDetailScreen extends ConsumerWidget {
                 label: const Text('Currency Converter'),
               ),
             ],
+          ),
+
+          const SizedBox(height: 24),
+
+          // ==========================================
+          // Summary Card
+          // ==========================================
+          Card(
+            color: Theme.of(context).colorScheme.primaryContainer,
+            child: Padding(
+              padding: const EdgeInsets.all(20.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Text(
+                    'Hangout Summary',
+                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                  ),
+                  const SizedBox(height: 16),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      const Text('Total Expense:'),
+                      Text('\$${totalSpent.toStringAsFixed(2)}', style: const TextStyle(fontWeight: FontWeight.bold)),
+                    ],
+                  ),
+                  const SizedBox(height: 8),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      const Text('People Count:'),
+                      Text('${hangout.participantIds.length}'),
+                    ],
+                  ),
+                  const SizedBox(height: 8),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      const Text('Expense Count:'),
+                      Text('${hangout.expenseIds.length}'),
+                    ],
+                  ),
+                  const Divider(height: 24),
+                  Row(
+                    children: [
+                      Icon(
+                        unpaidCount == 0 ? Icons.check_circle : Icons.warning_amber_rounded,
+                        color: unpaidCount == 0 ? Colors.green : Colors.red,
+                        size: 20,
+                      ),
+                      const SizedBox(width: 8),
+                      Text(
+                        summaryStatusText,
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          color: unpaidCount == 0 ? Colors.green : Colors.red,
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
           ),
 
           const SizedBox(height: 24),
