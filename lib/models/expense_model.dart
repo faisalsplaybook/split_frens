@@ -16,6 +16,11 @@ class ExpenseModel {
   // A list of person IDs who are involved in this expense
   final List<String> participantIds;
 
+  // Additional fields from Phase 1 PRD
+  final String? note;
+  final String? currency;
+  final double? convertedAmount;
+
   ExpenseModel({
     required this.id,
     required this.title,
@@ -24,6 +29,9 @@ class ExpenseModel {
     required this.paidById,
     required this.splitType,
     required this.participantIds,
+    this.note,
+    this.currency,
+    this.convertedAmount,
   });
 
   ExpenseModel copyWith({
@@ -34,6 +42,9 @@ class ExpenseModel {
     String? paidById,
     SplitType? splitType,
     List<String>? participantIds,
+    String? note,
+    String? currency,
+    double? convertedAmount,
   }) {
     return ExpenseModel(
       id: id ?? this.id,
@@ -42,9 +53,10 @@ class ExpenseModel {
       date: date ?? this.date,
       paidById: paidById ?? this.paidById,
       splitType: splitType ?? this.splitType,
-      // We don't want to just copy the reference to the list, we want a fresh list 
-      // if one is provided, otherwise keep the existing one.
       participantIds: participantIds ?? this.participantIds,
+      note: note ?? this.note,
+      currency: currency ?? this.currency,
+      convertedAmount: convertedAmount ?? this.convertedAmount,
     );
   }
 }

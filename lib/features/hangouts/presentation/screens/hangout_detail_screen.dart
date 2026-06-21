@@ -5,6 +5,7 @@ import '../providers/hangout_provider.dart';
 import '../providers/person_provider.dart';
 import '../../../../models/hangout_model.dart';
 import '../../../../models/person_model.dart';
+import '../providers/expense_provider.dart';
 
 // ==========================================
 // Hangout Detail Screen
@@ -136,7 +137,7 @@ class HangoutDetailScreen extends ConsumerWidget {
             ],
           ),
           const SizedBox(height: 12),
-          
+
           if (hangout.participantIds.isEmpty)
             Card(
               child: Padding(
@@ -152,7 +153,8 @@ class HangoutDetailScreen extends ConsumerWidget {
                       ),
                     ),
                     TextButton(
-                      onPressed: () => context.push('/hangout/$hangoutId/add-people'),
+                      onPressed: () =>
+                          context.push('/hangout/$hangoutId/add-people'),
                       child: const Text('Add Now'),
                     ),
                   ],
@@ -175,19 +177,23 @@ class HangoutDetailScreen extends ConsumerWidget {
                     // Fallback just in case
                     orElse: () => PersonModel(id: personId, name: '?'),
                   );
-                  
-                  final initials = person.name.isNotEmpty 
-                      ? person.name.substring(0, 1).toUpperCase() 
+
+                  final initials = person.name.isNotEmpty
+                      ? person.name.substring(0, 1).toUpperCase()
                       : '?';
 
                   return Padding(
                     padding: const EdgeInsets.only(right: 8.0),
                     child: CircleAvatar(
-                      backgroundColor: Theme.of(context).colorScheme.primaryContainer,
+                      backgroundColor: Theme.of(
+                        context,
+                      ).colorScheme.primaryContainer,
                       child: Text(
                         initials,
                         style: TextStyle(
-                          color: Theme.of(context).colorScheme.onPrimaryContainer,
+                          color: Theme.of(
+                            context,
+                          ).colorScheme.onPrimaryContainer,
                           fontWeight: FontWeight.bold,
                         ),
                       ),
@@ -208,23 +214,74 @@ class HangoutDetailScreen extends ConsumerWidget {
           ),
           const SizedBox(height: 12),
 
-          // A placeholder dummy expense tile to demonstrate navigation
-          // to the Expense Detail Screen.
-          Card(
-            child: ListTile(
-              leading: const CircleAvatar(child: Icon(Icons.fastfood)),
-              title: const Text('Dinner at Luigi\'s'),
-              subtitle: const Text('Paid by Alice'),
-              trailing: const Text(
-                '\$45.00',
-                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
-              ),
-              onTap: () {
-                // Navigate to a specific expense inside this hangout.
-                // We hardcode the expenseId 'exp_123' for this dummy tile.
-                context.push('/hangout/$hangoutId/expense/exp_123');
-              },
-            ),
+          Builder(
+            builder: (context) {
+              final allExpenses = ref.watch(expensesProvider);
+              final hangoutExpenses = allExpenses
+                  .where((e) => hangout!.expenseIds.contains(e.id))
+                  .toList();
+
+              if (hangoutExpenses.isEmpty) {
+                return Card(
+                  child: Padding(
+                    padding: const EdgeInsets.all(32.0),
+                    child: Center(
+                      child: Text(
+                        'No expenses added yet.',
+                        style: TextStyle(color: Colors.grey.shade600),
+                      ),
+                    ),
+                  ),
+                );
+              }
+
+              return ListView.builder(
+                shrinkWrap: true,
+                physics: const NeverScrollableScrollPhysics(),
+                itemCount: hangoutExpenses.length,
+                itemBuilder: (context, index) {
+                  final expense = hangoutExpenses[index];
+
+                  // Get Payer Name safely
+                  final allPeople = ref.read(personsProvider);
+                  final payer = allPeople.firstWhere(
+                    (p) => p.id == expense.paidById,
+                    orElse: () =>
+                        PersonModel(id: expense.paidById, name: 'Unknown'),
+                  );
+
+                  // Currency prefix (fallback to \$ if none)
+                  final currencySymbol = expense.currency ?? '\$';
+
+                  return Card(
+                    child: ListTile(
+                      leading: CircleAvatar(
+                        backgroundColor: Theme.of(
+                          context,
+                        ).colorScheme.secondaryContainer,
+                        child: const Icon(Icons.receipt),
+                      ),
+                      title: Text(expense.title),
+                      subtitle: Text(
+                        'Paid by ${payer.name} • ${expense.participantIds.length} participants',
+                      ),
+                      trailing: Text(
+                        '$currencySymbol${expense.amount.toStringAsFixed(2)}',
+                        style: const TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 16,
+                        ),
+                      ),
+                      onTap: () {
+                        context.push(
+                          '/hangout/$hangoutId/expense/${expense.id}',
+                        );
+                      },
+                    ),
+                  );
+                },
+              );
+            },
           ),
         ],
       ),
