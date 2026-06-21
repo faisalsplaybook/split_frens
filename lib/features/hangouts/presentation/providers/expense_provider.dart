@@ -1,5 +1,5 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../../../../models/expense_model.dart';
+import '../../data/models/expense_model.dart';
 import '../../../../data/dummy_data.dart';
 
 // ==========================================

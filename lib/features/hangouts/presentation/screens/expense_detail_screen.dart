@@ -1,11 +1,15 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+
+import '../../../../core/utils/date_formatter.dart';
+import '../../data/models/person_model.dart';
+import '../providers/expense_provider.dart';
+import '../providers/person_provider.dart';
 
 // ==========================================
 // Expense Detail Screen
 // ==========================================
-// This screen needs TWO parameters because an expense always
-// belongs to a specific hangout!
-class ExpenseDetailScreen extends StatelessWidget {
+class ExpenseDetailScreen extends ConsumerWidget {
   final String hangoutId;
   final String expenseId;
 
@@ -16,15 +20,220 @@ class ExpenseDetailScreen extends StatelessWidget {
   });
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    // 1. Fetch the expense
+    final expense = ref
+        .watch(expensesProvider)
+        .firstWhere(
+          (e) => e.id == expenseId,
+          orElse: () => throw Exception('Expense not found'),
+        );
+
+    // 2. Fetch people
+    final allPeople = ref.watch(personsProvider);
+    final payer = allPeople.firstWhere(
+      (p) => p.id == expense.paidById,
+      orElse: () => PersonModel(id: expense.paidById, name: 'Unknown'),
+    );
+
+    final participants = expense.participantIds
+        .map(
+          (id) => allPeople.firstWhere(
+            (p) => p.id == id,
+            orElse: () => PersonModel(id: id, name: 'Unknown'),
+          ),
+        )
+        .toList();
+
+    // 3. Calculate per-person share (Assuming equal split for MVP)
+    final shareAmount = participants.isEmpty
+        ? 0.0
+        : expense.amount / participants.length;
+
+    // Formatting currency
+    final currencySymbol = expense.currency ?? '\$';
+    final formattedAmount =
+        '$currencySymbol${expense.amount.toStringAsFixed(2)}';
+    final formattedShare = '$currencySymbol${shareAmount.toStringAsFixed(2)}';
+
     return Scaffold(
-      appBar: AppBar(title: const Text('Expense Details')),
-      body: Center(
-        child: Text(
-          'Details for Expense: $expenseId\nin Hangout: $hangoutId',
-          style: const TextStyle(fontSize: 18),
-          textAlign: TextAlign.center,
-        ),
+      appBar: AppBar(
+        title: const Text('Expense Details'),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.delete, color: Colors.red),
+            onPressed: () {
+              // MVP deletion (optional, not specifically requested but good UX)
+              // Just a placeholder snackbar for now
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(content: Text('Delete not implemented yet')),
+              );
+            },
+          ),
+        ],
+      ),
+      body: ListView(
+        padding: const EdgeInsets.all(16.0),
+        children: [
+          // ==========================================
+          // Header (Title, Amount, Date)
+          // ==========================================
+          Card(
+            child: Padding(
+              padding: const EdgeInsets.all(24.0),
+              child: Column(
+                children: [
+                  Text(
+                    expense.title,
+                    style: const TextStyle(
+                      fontSize: 24,
+                      fontWeight: FontWeight.bold,
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
+                  const SizedBox(height: 16),
+                  Text(
+                    formattedAmount,
+                    style: TextStyle(
+                      fontSize: 32,
+                      fontWeight: FontWeight.bold,
+                      color: Theme.of(context).colorScheme.primary,
+                    ),
+                  ),
+                  if (expense.convertedAmount != null) ...[
+                    const SizedBox(height: 8),
+                    Text(
+                      'Converted: \$${expense.convertedAmount!.toStringAsFixed(2)}',
+                      style: const TextStyle(fontSize: 16, color: Colors.grey),
+                    ),
+                  ],
+                  const SizedBox(height: 16),
+                  Text(
+                    'Added on ${DateFormatter.format(expense.date)}',
+                    style: const TextStyle(color: Colors.grey),
+                  ),
+                ],
+              ),
+            ),
+          ),
+          const SizedBox(height: 16),
+
+          // ==========================================
+          // Payer & Note
+          // ==========================================
+          Card(
+            child: Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Text(
+                    'Paid By',
+                    style: TextStyle(fontSize: 14, color: Colors.grey),
+                  ),
+                  const SizedBox(height: 4),
+                  Row(
+                    children: [
+                      CircleAvatar(
+                        radius: 16,
+                        child: Text(
+                          payer.name.isNotEmpty
+                              ? payer.name[0].toUpperCase()
+                              : '?',
+                          style: const TextStyle(fontSize: 12),
+                        ),
+                      ),
+                      const SizedBox(width: 8),
+                      Text(
+                        payer.name,
+                        style: const TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ],
+                  ),
+                  if (expense.note != null && expense.note!.isNotEmpty) ...[
+                    const SizedBox(height: 16),
+                    const Divider(),
+                    const SizedBox(height: 16),
+                    const Text(
+                      'Note',
+                      style: TextStyle(fontSize: 14, color: Colors.grey),
+                    ),
+                    const SizedBox(height: 4),
+                    Text(expense.note!, style: const TextStyle(fontSize: 16)),
+                  ],
+                ],
+              ),
+            ),
+          ),
+          const SizedBox(height: 16),
+
+          // ==========================================
+          // Participants & Share
+          // ==========================================
+          Card(
+            child: Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        'For ${participants.length} Participants',
+                        style: const TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      Text(
+                        '$formattedShare / person',
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                          color: Theme.of(context).colorScheme.primary,
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 16),
+                  const Divider(),
+                  const SizedBox(height: 8),
+                  ...participants.map((person) {
+                    return ListTile(
+                      contentPadding: EdgeInsets.zero,
+                      leading: CircleAvatar(
+                        radius: 16,
+                        backgroundColor: Theme.of(
+                          context,
+                        ).colorScheme.secondaryContainer,
+                        child: Text(
+                          person.name.isNotEmpty
+                              ? person.name[0].toUpperCase()
+                              : '?',
+                          style: TextStyle(
+                            fontSize: 12,
+                            color: Theme.of(
+                              context,
+                            ).colorScheme.onSecondaryContainer,
+                          ),
+                        ),
+                      ),
+                      title: Text(person.name),
+                      trailing: Text(
+                        formattedShare,
+                        style: const TextStyle(fontWeight: FontWeight.w500),
+                      ),
+                    );
+                  }),
+                ],
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }

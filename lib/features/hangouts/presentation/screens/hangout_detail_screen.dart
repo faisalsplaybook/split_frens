@@ -3,8 +3,8 @@ import 'package:go_router/go_router.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../providers/hangout_provider.dart';
 import '../providers/person_provider.dart';
-import '../../../../models/hangout_model.dart';
-import '../../../../models/person_model.dart';
+import '../../data/models/hangout_model.dart';
+import '../../data/models/person_model.dart';
 import '../providers/expense_provider.dart';
 
 // ==========================================

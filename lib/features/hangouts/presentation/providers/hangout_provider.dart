@@ -1,5 +1,5 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../../../../models/hangout_model.dart';
+import '../../data/models/hangout_model.dart';
 import '../../../../data/dummy_data.dart';
 
 // ==========================================
@@ -116,13 +116,13 @@ class HangoutsNotifier extends Notifier<List<HangoutModel>> {
   void markSettlementPaid(String hangoutId, String settlementId) {
     // TODO: Implement when we create the SettlementModel.
     // Settlements are usually derived from Expenses, or tracked in a separate list.
-    print('TODO: Mark settlement $settlementId as paid in Hangout $hangoutId');
+    debugPrint('TODO: Mark settlement $settlementId as paid in Hangout $hangoutId');
   }
 
   /// Marks a specific debt/settlement as Unpaid
   void markSettlementUnpaid(String hangoutId, String settlementId) {
     // TODO: Implement when we create the SettlementModel.
-    print(
+    debugPrint(
       'TODO: Mark settlement $settlementId as unpaid in Hangout $hangoutId',
     );
   }

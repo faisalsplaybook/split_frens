@@ -4,7 +4,7 @@ import 'package:uuid/uuid.dart';
 
 import '../../../../core/utils/validators.dart';
 import '../../../../shared/widgets/app_text_field.dart';
-import '../../../../models/person_model.dart';
+import '../../data/models/person_model.dart';
 import '../providers/hangout_provider.dart';
 import '../providers/person_provider.dart';
 import '../providers/expense_provider.dart';

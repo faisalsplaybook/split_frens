@@ -5,8 +5,8 @@ import 'package:uuid/uuid.dart';
 
 import '../../../../core/utils/validators.dart';
 import '../../../../shared/widgets/app_text_field.dart';
-import '../../../../models/expense_model.dart';
-import '../../../../models/split_type.dart';
+import '../../data/models/expense_model.dart';
+import '../../data/models/split_type.dart';
 import '../providers/hangout_provider.dart';
 import '../providers/person_provider.dart';
 import '../providers/expense_provider.dart';

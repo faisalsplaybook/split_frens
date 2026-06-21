@@ -1,7 +1,7 @@
-import '../models/expense_model.dart';
-import '../models/hangout_model.dart';
-import '../models/person_model.dart';
-import '../models/split_type.dart';
+import '../features/hangouts/data/models/expense_model.dart';
+import '../features/hangouts/data/models/hangout_model.dart';
+import '../features/hangouts/data/models/person_model.dart';
+import '../features/hangouts/data/models/split_type.dart';
 
 /// This class holds our dummy data for testing the UI before we connect a real database.
 /// We use 'static final' so we can access these lists anywhere in the app

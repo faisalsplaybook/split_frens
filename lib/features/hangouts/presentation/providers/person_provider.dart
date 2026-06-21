@@ -1,5 +1,5 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../../../../models/person_model.dart';
+import '../../data/models/person_model.dart';
 import '../../../../data/dummy_data.dart';
 
 // ==========================================

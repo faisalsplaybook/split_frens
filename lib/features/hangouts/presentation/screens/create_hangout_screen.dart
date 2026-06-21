@@ -5,7 +5,7 @@ import '../../../../core/utils/validators.dart';
 import 'package:go_router/go_router.dart';
 import 'package:uuid/uuid.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../../../../models/hangout_model.dart';
+import '../../data/models/hangout_model.dart';
 import '../providers/hangout_provider.dart';
 
 // ==========================================
