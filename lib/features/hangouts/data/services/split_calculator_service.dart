@@ -30,7 +30,7 @@ class SplitCalculatorService {
   /// 2. Calculates how much each person actually paid out of pocket
   Map<String, double> calculatePaidAmounts(HangoutModel hangout) {
     final paidAmounts = <String, double>{};
-    
+
     // Initialize all participants to 0
     for (final personId in hangout.participantIds) {
       paidAmounts[personId] = 0.0;
@@ -39,9 +39,11 @@ class SplitCalculatorService {
     // Add up the amounts paid by each person
     for (final expenseId in hangout.expenseIds) {
       final expense = _getExpense(expenseId);
-      if (expense != null && hangout.participantIds.contains(expense.paidById)) {
+      if (expense != null &&
+          hangout.participantIds.contains(expense.paidById)) {
         final effectiveAmount = expense.convertedAmount ?? expense.amount;
-        paidAmounts[expense.paidById] = (paidAmounts[expense.paidById] ?? 0.0) + effectiveAmount;
+        paidAmounts[expense.paidById] =
+            (paidAmounts[expense.paidById] ?? 0.0) + effectiveAmount;
       }
     }
 
@@ -62,10 +64,11 @@ class SplitCalculatorService {
       final expense = _getExpense(expenseId);
       if (expense != null && expense.participantIds.isNotEmpty) {
         final share = calculatePerPersonShare(expense);
-        
+
         for (final participantId in expense.participantIds) {
           if (hangout.participantIds.contains(participantId)) {
-             shareAmounts[participantId] = (shareAmounts[participantId] ?? 0.0) + share;
+            shareAmounts[participantId] =
+                (shareAmounts[participantId] ?? 0.0) + share;
           }
         }
       }
@@ -80,7 +83,7 @@ class SplitCalculatorService {
   Map<String, double> calculateNetBalances(HangoutModel hangout) {
     final paidAmounts = calculatePaidAmounts(hangout);
     final shareAmounts = calculateShareAmounts(hangout);
-    
+
     final netBalances = <String, double>{};
 
     for (final personId in hangout.participantIds) {
@@ -95,7 +98,7 @@ class SplitCalculatorService {
   /// 5. Generates the minimum number of transactions to settle all debts
   List<SettlementModel> generateSettlements(HangoutModel hangout) {
     final netBalances = calculateNetBalances(hangout);
-    
+
     // Separate into debtors (owe money) and creditors (are owed money)
     final debtors = <String, double>{};
     final creditors = <String, double>{};
@@ -132,7 +135,9 @@ class SplitCalculatorService {
       final creditorAmount = creditors[maxCreditorId]!;
 
       // Determine the settlement amount (the smaller of the two)
-      final settlementAmount = debtorAmount < creditorAmount ? debtorAmount : creditorAmount;
+      final settlementAmount = debtorAmount < creditorAmount
+          ? debtorAmount
+          : creditorAmount;
 
       // Create the settlement
       settlements.add(
