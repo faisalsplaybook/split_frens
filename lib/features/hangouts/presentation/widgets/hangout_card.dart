@@ -1,39 +1,47 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../data/models/hangout_model.dart';
+import '../../data/services/split_calculator_service.dart';
 import '../../../../core/utils/money_formatter.dart';
 import '../../../../core/utils/date_formatter.dart';
+import '../providers/expense_provider.dart';
 import 'package:go_router/go_router.dart';
 
 /// A custom widget to display the summary of a Hangout.
-class HangoutCard extends StatelessWidget {
-  // We pass the HangoutModel into this widget so it knows what to display.
+class HangoutCard extends ConsumerWidget {
   final HangoutModel hangout;
 
   const HangoutCard({super.key, required this.hangout});
 
   @override
-  Widget build(BuildContext context) {
-    // We use our new DateFormatter to format the model's start date
+  Widget build(BuildContext context, WidgetRef ref) {
+    final allExpenses = ref.watch(expensesProvider);
+    final calculator = SplitCalculatorService(allExpenses: allExpenses);
+    final totalAmount = calculator.calculateTotalSpent(hangout);
+
     final String dateStr = DateFormatter.format(hangout.startDate);
+    final String totalAmountStr = MoneyFormatter.format(totalAmount);
 
-    // For now, we still hardcode the total to 1380, but we use MoneyFormatter
-    // to give it the proper currency symbol and formatting.
-    final String totalAmountStr = MoneyFormatter.format(1380.0);
-
-    const String settlementStatusStr = 'Unsettled';
+    // Determine settlement status based on the hangout's paidSettlementIds
+    // We can't run the full settlement calc here without a circular dependency,
+    // so we check if any settlements exist by seeing if the hangout has expenses.
+    // A simple heuristic: if all settlement IDs are paid, it's settled.
+    // For now we just show Settled vs Unsettled.
+    final allSettlements = calculator.generateSettlements(hangout);
+    final unpaidCount = allSettlements
+        .where((s) => !hangout.paidSettlementIds.contains(s.id))
+        .length;
+    final isFullySettled = allSettlements.isNotEmpty && unpaidCount == 0;
+    final settlementStatusStr = isFullySettled ? 'Settled' : 'Unsettled';
+    final settlementColor = isFullySettled ? Colors.green : Colors.orange;
 
     return Card(
       margin: const EdgeInsets.only(bottom: 12),
-      // InkWell gives us that nice Material ripple effect when the card is tapped!
       child: InkWell(
         onTap: () {
-          // Navigate to this specific hangout's detail screen
-          // We use string interpolation to pass the hangout's unique ID into the URL
           context.push('/hangout/${hangout.id}');
         },
-        borderRadius: BorderRadius.circular(
-          16,
-        ), // Match the card's border radius
+        borderRadius: BorderRadius.circular(16),
         child: Padding(
           padding: const EdgeInsets.all(16.0),
           child: Column(
@@ -81,27 +89,24 @@ class HangoutCard extends StatelessWidget {
                         style: TextStyle(
                           fontSize: 24,
                           fontWeight: FontWeight.bold,
-                          color: Theme.of(
-                            context,
-                          ).colorScheme.primary, // Use primary color
+                          color: Theme.of(context).colorScheme.primary,
                         ),
                       ),
                     ],
                   ),
-                  // A small custom "Badge" for the settlement status
                   Container(
                     padding: const EdgeInsets.symmetric(
                       horizontal: 12,
                       vertical: 6,
                     ),
                     decoration: BoxDecoration(
-                      color: Colors.orange.shade100, // Light orange background
-                      borderRadius: BorderRadius.circular(20), // Pill shape
+                      color: settlementColor.shade100,
+                      borderRadius: BorderRadius.circular(20),
                     ),
                     child: Text(
                       settlementStatusStr,
                       style: TextStyle(
-                        color: Colors.orange.shade800, // Dark orange text
+                        color: settlementColor.shade800,
                         fontWeight: FontWeight.bold,
                         fontSize: 12,
                       ),
@@ -126,7 +131,7 @@ class HangoutCard extends StatelessWidget {
                     '${hangout.participantIds.length} people',
                     style: const TextStyle(color: Colors.grey),
                   ),
-                  const SizedBox(width: 16), // Spacing between the two stats
+                  const SizedBox(width: 16),
                   const Icon(
                     Icons.receipt_long_outlined,
                     size: 16,

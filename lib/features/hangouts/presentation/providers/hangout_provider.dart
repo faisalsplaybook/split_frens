@@ -1,23 +1,26 @@
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../data/models/hangout_model.dart';
-import '../../../../data/dummy_data.dart';
+import '../../data/services/local_storage_service.dart';
+import 'person_provider.dart';
+import 'expense_provider.dart';
 
 // ==========================================
 // Hangouts Notifier (State Management)
 // ==========================================
-// In Riverpod, a Notifier is a class that holds "State" (data that changes)
-// and provides methods to update that state. When the state changes, any UI
-// listening to it will automatically rebuild!
-//
-// Here, our state is simply a List<HangoutModel>.
 class HangoutsNotifier extends Notifier<List<HangoutModel>> {
-  // 1. Initial State
   @override
   List<HangoutModel> build() {
-    // We start by loading our dummy data so the screen isn't empty.
-    // When we add Hive (database) later, we will load from Hive here instead!
-    return [...DummyData.allHangouts];
+    return LocalStorageService.loadHangouts();
+  }
+
+  void _save() {
+    // Because we need to save all 3 lists at once to maintain normalized integrity
+    LocalStorageService.saveAllData(
+      hangouts: state,
+      persons: ref.read(personsProvider),
+      expenses: ref.read(expensesProvider),
+    );
   }
 
   // ==========================================
@@ -26,16 +29,14 @@ class HangoutsNotifier extends Notifier<List<HangoutModel>> {
 
   /// Creates a new hangout and adds it to our state list
   void createHangout(HangoutModel newHangout) {
-    // To update state in Riverpod, you MUST create a entirely new list.
-    // You cannot do state.add(newHangout).
-    // The `...state` syntax takes all existing items, and we append the new one.
     state = [...state, newHangout];
+    _save();
   }
 
   /// Deletes a hangout by its ID
   void deleteHangout(String id) {
-    // .where() filters the list, keeping only the ones that DO NOT match the ID.
     state = state.where((hangout) => hangout.id != id).toList();
+    _save();
   }
 
   /// Retrieves a specific hangout by its ID
@@ -51,6 +52,7 @@ class HangoutsNotifier extends Notifier<List<HangoutModel>> {
   /// Wipes all hangouts from the state
   void clearAllHangouts() {
     state = [];
+    _save();
   }
 
   // ==========================================
@@ -64,12 +66,12 @@ class HangoutsNotifier extends Notifier<List<HangoutModel>> {
   void addPerson(String hangoutId, String personId) {
     state = state.map((hangout) {
       if (hangout.id == hangoutId) {
-        // We found the target hangout! Let's update its participants.
         final newParticipants = [...hangout.participantIds, personId];
         return hangout.copyWith(participantIds: newParticipants);
       }
-      return hangout; // Return all other hangouts exactly as they were
+      return hangout;
     }).toList();
+    _save();
   }
 
   /// Removes a person from a specific hangout
@@ -83,6 +85,7 @@ class HangoutsNotifier extends Notifier<List<HangoutModel>> {
       }
       return hangout;
     }).toList();
+    _save();
   }
 
   /// Adds an expense to a specific hangout
@@ -94,6 +97,7 @@ class HangoutsNotifier extends Notifier<List<HangoutModel>> {
       }
       return hangout;
     }).toList();
+    _save();
   }
 
   /// Removes an expense from a specific hangout
@@ -107,6 +111,7 @@ class HangoutsNotifier extends Notifier<List<HangoutModel>> {
       }
       return hangout;
     }).toList();
+    _save();
   }
 
   // ==========================================
@@ -125,6 +130,7 @@ class HangoutsNotifier extends Notifier<List<HangoutModel>> {
       }
       return hangout;
     }).toList();
+    _save();
   }
 
   /// Marks a specific debt/settlement as Unpaid
@@ -140,6 +146,7 @@ class HangoutsNotifier extends Notifier<List<HangoutModel>> {
       }
       return hangout;
     }).toList();
+    _save();
   }
 }
 

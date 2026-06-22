@@ -32,4 +32,18 @@ class PersonModel {
       contactInfo: contactInfo ?? this.contactInfo,
     );
   }
+
+  Map<String, dynamic> toJson() => {
+        'id': id,
+        'name': name,
+        'avatarUrl': avatarUrl,
+        'contactInfo': contactInfo,
+      };
+
+  factory PersonModel.fromJson(Map<String, dynamic> json) => PersonModel(
+        id: json['id'] as String,
+        name: json['name'] as String,
+        avatarUrl: json['avatarUrl'] as String?,
+        contactInfo: json['contactInfo'] as String?,
+      );
 }

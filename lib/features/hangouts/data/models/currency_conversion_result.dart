@@ -29,4 +29,19 @@ class CurrencyConversionResult {
       lastUpdated: lastUpdated ?? this.lastUpdated,
     );
   }
+
+  Map<String, dynamic> toJson() => {
+        'fromCurrency': fromCurrency,
+        'toCurrency': toCurrency,
+        'rate': rate,
+        'lastUpdated': lastUpdated.toIso8601String(),
+      };
+
+  factory CurrencyConversionResult.fromJson(Map<String, dynamic> json) =>
+      CurrencyConversionResult(
+        fromCurrency: json['fromCurrency'] as String,
+        toCurrency: json['toCurrency'] as String,
+        rate: (json['rate'] as num).toDouble(),
+        lastUpdated: DateTime.parse(json['lastUpdated'] as String),
+      );
 }

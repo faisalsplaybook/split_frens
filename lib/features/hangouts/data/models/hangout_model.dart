@@ -43,4 +43,27 @@ class HangoutModel {
       paidSettlementIds: paidSettlementIds ?? this.paidSettlementIds,
     );
   }
+
+  Map<String, dynamic> toJson() => {
+        'id': id,
+        'title': title,
+        'startDate': startDate.toIso8601String(),
+        'endDate': endDate?.toIso8601String(),
+        'participantIds': participantIds,
+        'expenseIds': expenseIds,
+        'paidSettlementIds': paidSettlementIds,
+      };
+
+  factory HangoutModel.fromJson(Map<String, dynamic> json) => HangoutModel(
+        id: json['id'] as String,
+        title: json['title'] as String,
+        startDate: DateTime.parse(json['startDate'] as String),
+        endDate: json['endDate'] != null
+            ? DateTime.parse(json['endDate'] as String)
+            : null,
+        participantIds: List<String>.from(json['participantIds'] as List),
+        expenseIds: List<String>.from(json['expenseIds'] as List),
+        paidSettlementIds: List<String>.from(
+            json['paidSettlementIds'] as List? ?? []),
+      );
 }

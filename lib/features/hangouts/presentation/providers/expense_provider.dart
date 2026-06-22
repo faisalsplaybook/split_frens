@@ -1,21 +1,27 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../data/models/expense_model.dart';
-import '../../../../data/dummy_data.dart';
+import '../../data/services/local_storage_service.dart';
+import 'hangout_provider.dart';
+import 'person_provider.dart';
 
-// ==========================================
-// Expenses Notifier (State Management)
-// ==========================================
-// This provider manages all expenses across the entire app.
 class ExpensesNotifier extends Notifier<List<ExpenseModel>> {
   @override
   List<ExpenseModel> build() {
-    // Start with our dummy data
-    return [...DummyData.allExpenses];
+    return LocalStorageService.loadExpenses();
+  }
+
+  void _save() {
+    LocalStorageService.saveAllData(
+      hangouts: ref.read(hangoutsProvider),
+      persons: ref.read(personsProvider),
+      expenses: state,
+    );
   }
 
   /// Adds a new expense to our global list
   void addExpense(ExpenseModel expense) {
     state = [...state, expense];
+    _save();
   }
 
   /// Finds an expense by its ID
@@ -35,11 +41,13 @@ class ExpensesNotifier extends Notifier<List<ExpenseModel>> {
       }
       return e;
     }).toList();
+    _save();
   }
 
   /// Removes an expense completely from the app
   void deleteExpense(String id) {
     state = state.where((e) => e.id != id).toList();
+    _save();
   }
 }
 

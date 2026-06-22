@@ -35,4 +35,22 @@ class SettlementModel {
       isPaid: isPaid ?? this.isPaid,
     );
   }
+
+  Map<String, dynamic> toJson() => {
+        'id': id,
+        'payerId': payerId,
+        'payeeId': payeeId,
+        'amount': amount,
+        'date': date.toIso8601String(),
+        'isPaid': isPaid,
+      };
+
+  factory SettlementModel.fromJson(Map<String, dynamic> json) => SettlementModel(
+        id: json['id'] as String,
+        payerId: json['payerId'] as String,
+        payeeId: json['payeeId'] as String,
+        amount: (json['amount'] as num).toDouble(),
+        date: DateTime.parse(json['date'] as String),
+        isPaid: json['isPaid'] as bool? ?? false,
+      );
 }

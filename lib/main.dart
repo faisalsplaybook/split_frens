@@ -6,10 +6,14 @@ import 'core/theme/app_theme.dart';
 // 2. Import our newly created router
 import 'core/router/app_router.dart';
 
-void main() {
-  // runApp is the starting point of any Flutter app.
-  // By wrapping our MyApp with ProviderScope, we enable Riverpod
-  // for the entire application. Without this, providers won't work!
+import 'features/hangouts/data/services/local_storage_service.dart';
+import 'features/settings/data/services/settings_service.dart';
+
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await LocalStorageService.init();
+  await SettingsService.init();
+
   runApp(const ProviderScope(child: MyApp()));
 }
 

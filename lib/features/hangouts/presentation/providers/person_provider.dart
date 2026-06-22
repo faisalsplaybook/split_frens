@@ -1,16 +1,21 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../data/models/person_model.dart';
-import '../../../../data/dummy_data.dart';
+import '../../data/services/local_storage_service.dart';
+import 'hangout_provider.dart';
+import 'expense_provider.dart';
 
-// ==========================================
-// Persons Notifier (State Management)
-// ==========================================
-// This provider manages all the people/contacts across the entire app.
 class PersonsNotifier extends Notifier<List<PersonModel>> {
   @override
   List<PersonModel> build() {
-    // Start with our dummy data
-    return [...DummyData.allPeople];
+    return LocalStorageService.loadPersons();
+  }
+
+  void _save() {
+    LocalStorageService.saveAllData(
+      hangouts: ref.read(hangoutsProvider),
+      persons: state,
+      expenses: ref.read(expensesProvider),
+    );
   }
 
   /// Adds a new person to our global list
@@ -25,6 +30,7 @@ class PersonsNotifier extends Notifier<List<PersonModel>> {
     }
     
     state = [...state, person];
+    _save();
   }
 
   /// Finds a person by their ID
@@ -44,11 +50,13 @@ class PersonsNotifier extends Notifier<List<PersonModel>> {
       }
       return p;
     }).toList();
+    _save();
   }
 
   /// Removes a person completely from the app
   void deletePerson(String id) {
     state = state.where((p) => p.id != id).toList();
+    _save();
   }
 }
 

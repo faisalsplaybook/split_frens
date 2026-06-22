@@ -59,4 +59,30 @@ class ExpenseModel {
       convertedAmount: convertedAmount ?? this.convertedAmount,
     );
   }
+
+  Map<String, dynamic> toJson() => {
+        'id': id,
+        'title': title,
+        'amount': amount,
+        'date': date.toIso8601String(),
+        'paidById': paidById,
+        'splitType': splitType.name,
+        'participantIds': participantIds,
+        'note': note,
+        'currency': currency,
+        'convertedAmount': convertedAmount,
+      };
+
+  factory ExpenseModel.fromJson(Map<String, dynamic> json) => ExpenseModel(
+        id: json['id'] as String,
+        title: json['title'] as String,
+        amount: (json['amount'] as num).toDouble(),
+        date: DateTime.parse(json['date'] as String),
+        paidById: json['paidById'] as String,
+        splitType: SplitType.values.byName(json['splitType'] as String),
+        participantIds: List<String>.from(json['participantIds'] as List),
+        note: json['note'] as String?,
+        currency: json['currency'] as String?,
+        convertedAmount: (json['convertedAmount'] as num?)?.toDouble(),
+      );
 }
