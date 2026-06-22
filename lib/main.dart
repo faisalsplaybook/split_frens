@@ -6,16 +6,12 @@ import 'core/theme/app_theme.dart';
 // 2. Import our newly created router
 import 'core/router/app_router.dart';
 
-import 'features/hangouts/data/services/local_storage_service.dart';
-import 'features/settings/data/services/settings_service.dart';
 
-void main() async {
-  WidgetsFlutterBinding.ensureInitialized();
-  await LocalStorageService.init();
-  await SettingsService.init();
-
+void main() {
   runApp(const ProviderScope(child: MyApp()));
 }
+
+
 
 // 3. We change StatelessWidget to ConsumerWidget.
 // A ConsumerWidget is a Riverpod widget that can "listen" to providers.

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../features/hangouts/data/models/hangout_model.dart';
 import '../features/hangouts/presentation/widgets/hangout_card.dart';
 import 'package:go_router/go_router.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -13,20 +14,22 @@ class HomeScreen extends ConsumerWidget {
     // Watch the hangouts provider. If the list changes (e.g. a new one is added),
     // this entire HomeScreen will automatically redraw!
     final hangouts = ref.watch(hangoutsProvider);
+    // Sort by most recent first, then take the first 3
+    final recentHangouts = [...hangouts]
+      ..sort((a, b) => b.startDate.compareTo(a.startDate));
+    final preview = recentHangouts.take(3).toList();
+
     return Scaffold(
       appBar: AppBar(
-        // App name
         title: const Text(
           'SplitFrens',
           style: TextStyle(fontWeight: FontWeight.bold),
         ),
         centerTitle: true,
-        // Settings icon on the top right
         actions: [
           IconButton(
             icon: const Icon(Icons.settings),
             onPressed: () {
-              // Navigate to the Settings screen
               context.push('/settings');
             },
           ),
@@ -36,12 +39,10 @@ class HomeScreen extends ConsumerWidget {
         padding: const EdgeInsets.all(16.0),
         child: Column(
           children: [
-            // The Expanded widget makes this section take up all available space
-            // pushing the buttons at the bottom down.
             Expanded(
               child: hangouts.isEmpty
                   ? _buildEmptyState(context)
-                  : _buildRecentHangouts(context, hangouts),
+                  : _buildRecentHangouts(context, preview, hangouts.length),
             ),
 
             // ==========================================
@@ -104,19 +105,32 @@ class HomeScreen extends ConsumerWidget {
   }
 
   /// Builds the view shown when there ARE recent hangouts
-  Widget _buildRecentHangouts(BuildContext context, List<dynamic> hangouts) {
+  Widget _buildRecentHangouts(
+    BuildContext context,
+    List<HangoutModel> hangouts,
+    int totalCount,
+  ) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         // Section Title
-        const Text(
-          'Your Hangouts',
-          style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            const Text(
+              'Recent Hangouts',
+              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+            ),
+            if (totalCount > 3)
+              TextButton(
+                onPressed: () => context.push('/history'),
+                child: const Text('See all'),
+              ),
+          ],
         ),
         const SizedBox(height: 12),
 
-        // List of hangout cards
-        // We use ListView.builder for scrollable lists
+        // List of hangout cards (max 3)
         Expanded(
           child: ListView.builder(
             itemCount: hangouts.length,
