@@ -4,11 +4,13 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../providers/hangout_provider.dart';
 import '../providers/person_provider.dart';
 import '../../data/models/hangout_model.dart';
-import '../../data/models/person_model.dart';
 import '../providers/expense_provider.dart';
 import '../../data/services/split_calculator_service.dart';
 import 'package:share_plus/share_plus.dart';
 import '../../../../core/utils/summary_generator.dart';
+import '../widgets/summary_section.dart';
+import '../widgets/people_section.dart';
+import '../widgets/expense_section.dart';
 
 // ==========================================
 // Hangout Detail Screen
@@ -65,11 +67,6 @@ class HangoutDetailScreen extends ConsumerWidget {
     final calculator = SplitCalculatorService(allExpenses: allExpenses);
     final totalSpent = calculator.calculateTotalSpent(hangout);
     final settlements = calculator.generateSettlements(hangout);
-    final unpaidCount = settlements.where((s) => !s.isPaid).length;
-
-    final summaryStatusText = unpaidCount == 0
-        ? 'Everyone settled'
-        : '$unpaidCount unpaid settlement${unpaidCount > 1 ? 's' : ''}';
 
     return Scaffold(
       appBar: AppBar(
@@ -155,236 +152,23 @@ class HangoutDetailScreen extends ConsumerWidget {
           const SizedBox(height: 24),
 
           // ==========================================
-          // Summary Card
+          // 2. Summary Card (Extracted Widget)
           // ==========================================
-          Card(
-            color: Theme.of(context).colorScheme.primaryContainer,
-            child: Padding(
-              padding: const EdgeInsets.all(20.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const Text(
-                    'Hangout Summary',
-                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                  ),
-                  const SizedBox(height: 16),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      const Text('Total Expense:'),
-                      Text(
-                        '\$${totalSpent.toStringAsFixed(2)}',
-                        style: const TextStyle(fontWeight: FontWeight.bold),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 8),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      const Text('People Count:'),
-                      Text('${hangout.participantIds.length}'),
-                    ],
-                  ),
-                  const SizedBox(height: 8),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      const Text('Expense Count:'),
-                      Text('${hangout.expenseIds.length}'),
-                    ],
-                  ),
-                  const Divider(height: 24),
-                  Row(
-                    children: [
-                      Icon(
-                        unpaidCount == 0
-                            ? Icons.check_circle
-                            : Icons.warning_amber_rounded,
-                        color: unpaidCount == 0 ? Colors.green : Colors.red,
-                        size: 20,
-                      ),
-                      const SizedBox(width: 8),
-                      Text(
-                        summaryStatusText,
-                        style: TextStyle(
-                          fontWeight: FontWeight.bold,
-                          color: unpaidCount == 0 ? Colors.green : Colors.red,
-                        ),
-                      ),
-                    ],
-                  ),
-                ],
-              ),
-            ),
-          ),
+          SummarySection(hangout: hangout),
 
           const SizedBox(height: 24),
 
           // ==========================================
-          // People Preview
+          // 3. People Preview (Extracted Widget)
           // ==========================================
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              const Text(
-                'Participants',
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-              ),
-              Text(
-                '${hangout.participantIds.length} people',
-                style: const TextStyle(color: Colors.grey),
-              ),
-            ],
-          ),
-          const SizedBox(height: 12),
-
-          if (hangout.participantIds.isEmpty)
-            Card(
-              child: Padding(
-                padding: const EdgeInsets.all(16.0),
-                child: Row(
-                  children: [
-                    const Icon(Icons.people_alt_outlined, color: Colors.grey),
-                    const SizedBox(width: 16),
-                    Expanded(
-                      child: Text(
-                        'Add friends to start splitting.',
-                        style: TextStyle(color: Colors.grey.shade600),
-                      ),
-                    ),
-                    TextButton(
-                      onPressed: () =>
-                          context.push('/hangout/$hangoutId/add-people'),
-                      child: const Text('Add Now'),
-                    ),
-                  ],
-                ),
-              ),
-            )
-          else
-            SizedBox(
-              height: 50,
-              child: ListView.builder(
-                scrollDirection: Axis.horizontal,
-                itemCount: hangout.participantIds.length,
-                itemBuilder: (context, index) {
-                  final personId = hangout!.participantIds[index];
-                  // In a real app we might fetch the PersonModel to show initials
-                  // But since we have access to personsProvider, let's get it!
-                  final allPeople = ref.read(personsProvider);
-                  final person = allPeople.firstWhere(
-                    (p) => p.id == personId,
-                    // Fallback just in case
-                    orElse: () => PersonModel(id: personId, name: '?'),
-                  );
-
-                  final initials = person.name.isNotEmpty
-                      ? person.name.substring(0, 1).toUpperCase()
-                      : '?';
-
-                  return Padding(
-                    padding: const EdgeInsets.only(right: 8.0),
-                    child: CircleAvatar(
-                      backgroundColor: Theme.of(
-                        context,
-                      ).colorScheme.primaryContainer,
-                      child: Text(
-                        initials,
-                        style: TextStyle(
-                          color: Theme.of(
-                            context,
-                          ).colorScheme.onPrimaryContainer,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    ),
-                  );
-                },
-              ),
-            ),
+          PeopleSection(hangout: hangout),
 
           const SizedBox(height: 32),
 
           // ==========================================
-          // 2. Expenses List
+          // 4. Expenses List (Extracted Widget)
           // ==========================================
-          const Text(
-            'Recent Expenses',
-            style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-          ),
-          const SizedBox(height: 12),
-
-          Builder(
-            builder: (context) {
-              final allExpenses = ref.watch(expensesProvider);
-              final hangoutExpenses = allExpenses
-                  .where((e) => hangout!.expenseIds.contains(e.id))
-                  .toList();
-
-              if (hangoutExpenses.isEmpty) {
-                return Card(
-                  child: Padding(
-                    padding: const EdgeInsets.all(32.0),
-                    child: Center(
-                      child: Text(
-                        'No expenses added yet.',
-                        style: TextStyle(color: Colors.grey.shade600),
-                      ),
-                    ),
-                  ),
-                );
-              }
-
-              return ListView.builder(
-                shrinkWrap: true,
-                physics: const NeverScrollableScrollPhysics(),
-                itemCount: hangoutExpenses.length,
-                itemBuilder: (context, index) {
-                  final expense = hangoutExpenses[index];
-
-                  // Get Payer Name safely
-                  final allPeople = ref.read(personsProvider);
-                  final payer = allPeople.firstWhere(
-                    (p) => p.id == expense.paidById,
-                    orElse: () =>
-                        PersonModel(id: expense.paidById, name: 'Unknown'),
-                  );
-
-                  // Currency prefix (fallback to \$ if none)
-                  final currencySymbol = expense.currency ?? '\$';
-
-                  return Card(
-                    child: ListTile(
-                      leading: CircleAvatar(
-                        backgroundColor: Theme.of(
-                          context,
-                        ).colorScheme.secondaryContainer,
-                        child: const Icon(Icons.receipt),
-                      ),
-                      title: Text(expense.title),
-                      subtitle: Text(
-                        'Paid by ${payer.name} • ${expense.participantIds.length} participants',
-                      ),
-                      trailing: Text(
-                        '$currencySymbol${expense.amount.toStringAsFixed(2)}',
-                        style: const TextStyle(
-                          fontWeight: FontWeight.bold,
-                          fontSize: 16,
-                        ),
-                      ),
-                      onTap: () {
-                        context.push(
-                          '/hangout/$hangoutId/expense/${expense.id}',
-                        );
-                      },
-                    ),
-                  );
-                },
-              );
-            },
-          ),
+          ExpenseSection(hangout: hangout),
         ],
       ),
     );

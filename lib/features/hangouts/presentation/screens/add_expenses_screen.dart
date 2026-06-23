@@ -254,8 +254,9 @@ class _AddExpensesScreenState extends ConsumerState<AddExpensesScreen> {
                             )
                             .toList(),
                         onChanged: (val) {
-                          if (val != null)
+                          if (val != null) {
                             setState(() => _selectedCurrency = val);
+                          }
                         },
                       ),
                       const SizedBox(height: 16),
