@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:split_frens/features/hangouts/data/models/hangout_model.dart';
 
 import '../../data/models/person_model.dart';
 import '../../data/services/split_calculator_service.dart';
@@ -8,6 +9,7 @@ import '../providers/hangout_provider.dart';
 import '../providers/person_provider.dart';
 import 'package:share_plus/share_plus.dart';
 import '../../../../core/utils/summary_generator.dart';
+
 // ==========================================
 // Split Result Screen
 // ==========================================
@@ -22,8 +24,21 @@ class SplitResultsScreen extends ConsumerWidget {
         .watch(hangoutsProvider)
         .firstWhere(
           (h) => h.id == hangoutId,
-          orElse: () => throw Exception('Hangout not found'),
+          orElse: () => HangoutModel(
+            id: '',
+            title: '',
+            participantIds: [],
+            expenseIds: [],
+            startDate: DateTime.now(),
+          ),
         );
+
+    if (hangout.id.isEmpty) {
+      return Scaffold(
+        appBar: AppBar(title: const Text('Error')),
+        body: const Center(child: Text('Hangout not found.')),
+      );
+    }
     final allExpenses = ref.watch(expensesProvider);
     final allPeople = ref.watch(personsProvider);
 
@@ -222,9 +237,22 @@ class SplitResultsScreen extends ConsumerWidget {
             padding: const EdgeInsets.symmetric(horizontal: 16.0),
             child: OutlinedButton.icon(
               onPressed: () {
-                final hangoutPeople = allPeople.where((p) => hangout.participantIds.contains(p.id)).toList();
-                final hangoutExpenses = allExpenses.where((e) => hangout.expenseIds.contains(e.id)).toList();
-                
+                if (hangout.expenseIds.isEmpty) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                      content: Text('Add expenses before sharing a summary.'),
+                    ),
+                  );
+                  return;
+                }
+
+                final hangoutPeople = allPeople
+                    .where((p) => hangout.participantIds.contains(p.id))
+                    .toList();
+                final hangoutExpenses = allExpenses
+                    .where((e) => hangout.expenseIds.contains(e.id))
+                    .toList();
+
                 final summary = SummaryGenerator.generateSummary(
                   hangout: hangout,
                   expenses: hangoutExpenses,
@@ -232,7 +260,7 @@ class SplitResultsScreen extends ConsumerWidget {
                   settlements: settlements,
                   totalExpense: totalSpent,
                 );
-                
+
                 // ignore: deprecated_member_use
                 Share.share(summary);
               },

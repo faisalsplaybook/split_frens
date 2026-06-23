@@ -56,4 +56,31 @@ class AppValidators {
     }
     return null;
   }
+
+  // 5. Duplicate person name
+  static String? validateDuplicateName(String? value, List<String> existingNames) {
+    final requiredError = validateRequiredText(value, 'Person name');
+    if (requiredError != null) return requiredError;
+
+    if (existingNames.contains(value!.trim())) {
+      return 'Name already exists';
+    }
+    return null;
+  }
+
+  // 6. Missing payer
+  static String? validatePayer(String? payerId) {
+    if (payerId == null || payerId.isEmpty) {
+      return 'Payer is required';
+    }
+    return null;
+  }
+
+  // 7. No participants selected
+  static String? validateParticipants(List<String> participantIds) {
+    if (participantIds.isEmpty) {
+      return 'At least one participant must be selected';
+    }
+    return null;
+  }
 }
