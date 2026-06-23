@@ -6,7 +6,8 @@ import '../../data/services/split_calculator_service.dart';
 import '../providers/expense_provider.dart';
 import '../providers/hangout_provider.dart';
 import '../providers/person_provider.dart';
-
+import 'package:share_plus/share_plus.dart';
+import '../../../../core/utils/summary_generator.dart';
 // ==========================================
 // Split Result Screen
 // ==========================================
@@ -214,6 +215,31 @@ class SplitResultsScreen extends ConsumerWidget {
                 ),
               );
             }),
+
+          const SizedBox(height: 32),
+
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16.0),
+            child: OutlinedButton.icon(
+              onPressed: () {
+                final hangoutPeople = allPeople.where((p) => hangout.participantIds.contains(p.id)).toList();
+                final hangoutExpenses = allExpenses.where((e) => hangout.expenseIds.contains(e.id)).toList();
+                
+                final summary = SummaryGenerator.generateSummary(
+                  hangout: hangout,
+                  expenses: hangoutExpenses,
+                  people: hangoutPeople,
+                  settlements: settlements,
+                  totalExpense: totalSpent,
+                );
+                
+                // ignore: deprecated_member_use
+                Share.share(summary);
+              },
+              icon: const Icon(Icons.share),
+              label: const Text('Share Final Split'),
+            ),
+          ),
 
           const SizedBox(height: 32),
         ],

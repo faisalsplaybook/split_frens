@@ -7,7 +7,8 @@ import '../../data/services/split_calculator_service.dart';
 import '../providers/expense_provider.dart';
 import '../providers/hangout_provider.dart';
 import '../providers/person_provider.dart';
-
+import 'package:share_plus/share_plus.dart';
+import '../../../../core/utils/summary_generator.dart';
 // ==========================================
 // Settlements Screen
 // ==========================================
@@ -49,35 +50,42 @@ class SettlementsScreen extends ConsumerWidget {
         return;
       }
 
-      final buffer = StringBuffer();
-      buffer.writeln('💸 ${hangout.title} - Settlements 💸\n');
-      
-      for (final s in settlements) {
-        final debtor = getPersonName(s.payerId);
-        final creditor = getPersonName(s.payeeId);
-        final status = s.isPaid ? '✅ Paid' : '❌ Unpaid';
-        buffer.writeln('$debtor owes $creditor \$${s.amount.toStringAsFixed(2)} ($status)');
-      }
+      final hangoutPeople = allPeople.where((p) => hangout.participantIds.contains(p.id)).toList();
+      final hangoutExpenses = allExpenses.where((e) => hangout.expenseIds.contains(e.id)).toList();
+      final totalSpent = calculator.calculateTotalSpent(hangout);
 
-      // Copy to clipboard for MVP sharing
-      Clipboard.setData(ClipboardData(text: buffer.toString()));
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Settlement summary copied to clipboard!')),
+      final summary = SummaryGenerator.generateSummary(
+        hangout: hangout,
+        expenses: hangoutExpenses,
+        people: hangoutPeople,
+        settlements: settlements,
+        totalExpense: totalSpent,
       );
+
+      // ignore: deprecated_member_use
+      Share.share(summary);
     }
 
     return Scaffold(
       appBar: AppBar(
         title: const Text('Settlements'),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.share),
-            tooltip: 'Share Settlement Summary',
-            onPressed: shareSettlements,
-          ),
-        ],
+        actions: const [],
       ),
-      body: settlements.isEmpty
+      body: Column(
+        children: [
+          Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: SizedBox(
+              width: double.infinity,
+              child: OutlinedButton.icon(
+                onPressed: shareSettlements,
+                icon: const Icon(Icons.share),
+                label: const Text('Share Settlement Summary'),
+              ),
+            ),
+          ),
+          Expanded(
+            child: settlements.isEmpty
           ? Center(
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
@@ -181,6 +189,9 @@ class SettlementsScreen extends ConsumerWidget {
                 );
               },
             ),
+          ),
+        ],
+      ),
     );
   }
 }

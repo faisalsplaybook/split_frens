@@ -7,6 +7,8 @@ import '../../data/models/hangout_model.dart';
 import '../../data/models/person_model.dart';
 import '../providers/expense_provider.dart';
 import '../../data/services/split_calculator_service.dart';
+import 'package:share_plus/share_plus.dart';
+import '../../../../core/utils/summary_generator.dart';
 
 // ==========================================
 // Hangout Detail Screen
@@ -65,26 +67,14 @@ class HangoutDetailScreen extends ConsumerWidget {
     final settlements = calculator.generateSettlements(hangout);
     final unpaidCount = settlements.where((s) => !s.isPaid).length;
 
-    final summaryStatusText = unpaidCount == 0 
-        ? 'Everyone settled' 
+    final summaryStatusText = unpaidCount == 0
+        ? 'Everyone settled'
         : '$unpaidCount unpaid settlement${unpaidCount > 1 ? 's' : ''}';
 
     return Scaffold(
       appBar: AppBar(
         // We use the actual title of the hangout instead of the raw ID!
         title: Text(hangout.title),
-        actions: [
-          // Share Summary Action
-          IconButton(
-            icon: const Icon(Icons.share),
-            onPressed: () {
-              // TODO: Implement share functionality
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(content: Text('Share placeholder for now!')),
-              );
-            },
-          ),
-        ],
       ),
       // We use a ListView so the screen can scroll if we have many expenses
       body: ListView(
@@ -126,6 +116,39 @@ class HangoutDetailScreen extends ConsumerWidget {
                 icon: const Icon(Icons.currency_exchange),
                 label: const Text('Currency Converter'),
               ),
+              OutlinedButton.icon(
+                onPressed: () {
+                  if (hangout!.expenseIds.isEmpty) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(
+                        content: Text('Add expenses before sharing a summary.'),
+                      ),
+                    );
+                    return;
+                  }
+
+                  final allPeople = ref.read(personsProvider);
+                  final hangoutPeople = allPeople
+                      .where((p) => hangout!.participantIds.contains(p.id))
+                      .toList();
+                  final hangoutExpenses = allExpenses
+                      .where((e) => hangout!.expenseIds.contains(e.id))
+                      .toList();
+
+                  final summary = SummaryGenerator.generateSummary(
+                    hangout: hangout,
+                    expenses: hangoutExpenses,
+                    people: hangoutPeople,
+                    settlements: settlements,
+                    totalExpense: totalSpent,
+                  );
+
+                  // ignore: deprecated_member_use
+                  Share.share(summary);
+                },
+                icon: const Icon(Icons.share),
+                label: const Text('Share Summary'),
+              ),
             ],
           ),
 
@@ -150,7 +173,10 @@ class HangoutDetailScreen extends ConsumerWidget {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       const Text('Total Expense:'),
-                      Text('\$${totalSpent.toStringAsFixed(2)}', style: const TextStyle(fontWeight: FontWeight.bold)),
+                      Text(
+                        '\$${totalSpent.toStringAsFixed(2)}',
+                        style: const TextStyle(fontWeight: FontWeight.bold),
+                      ),
                     ],
                   ),
                   const SizedBox(height: 8),
@@ -173,7 +199,9 @@ class HangoutDetailScreen extends ConsumerWidget {
                   Row(
                     children: [
                       Icon(
-                        unpaidCount == 0 ? Icons.check_circle : Icons.warning_amber_rounded,
+                        unpaidCount == 0
+                            ? Icons.check_circle
+                            : Icons.warning_amber_rounded,
                         color: unpaidCount == 0 ? Colors.green : Colors.red,
                         size: 20,
                       ),
