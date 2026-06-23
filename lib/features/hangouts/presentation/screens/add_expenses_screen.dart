@@ -10,6 +10,9 @@ import '../../data/models/split_type.dart';
 import '../providers/hangout_provider.dart';
 import '../providers/person_provider.dart';
 import '../providers/expense_provider.dart';
+import '../../../../core/constants/currency_constants.dart';
+import '../../../settings/data/services/settings_service.dart';
+import '../../../currency/presentation/providers/currency_provider.dart';
 
 // ==========================================
 // Add Expenses Screen
@@ -34,7 +37,7 @@ class _AddExpensesScreenState extends ConsumerState<AddExpensesScreen> {
 
   // For Phase 1 travel mode / currency
   bool _isTravelMode = false;
-  final _currencyController = TextEditingController();
+  String _selectedCurrency = CurrencyConstants.supportedCurrencies.first;
   final _convertedAmountController = TextEditingController();
 
   @override
@@ -42,7 +45,6 @@ class _AddExpensesScreenState extends ConsumerState<AddExpensesScreen> {
     _titleController.dispose();
     _amountController.dispose();
     _noteController.dispose();
-    _currencyController.dispose();
     _convertedAmountController.dispose();
     super.dispose();
   }
@@ -78,7 +80,7 @@ class _AddExpensesScreenState extends ConsumerState<AddExpensesScreen> {
         note: _noteController.text.trim().isNotEmpty
             ? _noteController.text.trim()
             : null,
-        currency: _isTravelMode ? _currencyController.text.trim() : null,
+        currency: _isTravelMode ? _selectedCurrency : null,
         convertedAmount:
             _isTravelMode && _convertedAmountController.text.trim().isNotEmpty
             ? double.tryParse(_convertedAmountController.text.trim())
@@ -103,6 +105,35 @@ class _AddExpensesScreenState extends ConsumerState<AddExpensesScreen> {
       } else {
         context.go('/hangout/${widget.hangoutId}');
       }
+    }
+  }
+
+  Future<void> _convertCurrency() async {
+    final amount = double.tryParse(_amountController.text.trim()) ?? 0.0;
+    if (amount <= 0) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Please enter a valid amount to convert.'),
+        ),
+      );
+      return;
+    }
+
+    final baseCurrency = SettingsService.getDefaultCurrency();
+
+    await ref
+        .read(currencyProvider.notifier)
+        .convert(
+          amount: amount,
+          fromCurrency: _selectedCurrency,
+          toCurrency: baseCurrency,
+        );
+
+    final state = ref.read(currencyProvider);
+    if (state.status == CurrencyStateStatus.success) {
+      _convertedAmountController.text = state.convertedAmount.toStringAsFixed(
+        2,
+      );
     }
   }
 
@@ -210,25 +241,85 @@ class _AddExpensesScreenState extends ConsumerState<AddExpensesScreen> {
                     ),
                     if (_isTravelMode) ...[
                       const SizedBox(height: 16),
-                      AppTextField(
-                        controller: _currencyController,
-                        label: 'Currency',
-                        hint: 'e.g. EUR, THB, JPY',
-                        prefixIcon: Icons.public,
-                        validator: (value) => AppValidators.validateCurrency(
-                          value,
-                          _isTravelMode,
+                      DropdownButtonFormField<String>(
+                        decoration: const InputDecoration(
+                          labelText: 'Currency',
+                          border: OutlineInputBorder(),
+                          prefixIcon: Icon(Icons.public),
                         ),
+                        initialValue: _selectedCurrency,
+                        items: CurrencyConstants.supportedCurrencies
+                            .map(
+                              (c) => DropdownMenuItem(value: c, child: Text(c)),
+                            )
+                            .toList(),
+                        onChanged: (val) {
+                          if (val != null)
+                            setState(() => _selectedCurrency = val);
+                        },
                       ),
                       const SizedBox(height: 16),
-                      AppTextField(
-                        controller: _convertedAmountController,
-                        label: 'Converted Amount (Optional)',
-                        hint: '0.00',
-                        prefixIcon: Icons.currency_exchange,
-                        keyboardType: const TextInputType.numberWithOptions(
-                          decimal: true,
-                        ),
+                      Row(
+                        children: [
+                          Expanded(
+                            child: AppTextField(
+                              controller: _convertedAmountController,
+                              label:
+                                  'Converted Amount (${SettingsService.getDefaultCurrency()})',
+                              hint: '0.00',
+                              prefixIcon: Icons.currency_exchange,
+                              keyboardType:
+                                  const TextInputType.numberWithOptions(
+                                    decimal: true,
+                                  ),
+                            ),
+                          ),
+                          const SizedBox(width: 8),
+                          ElevatedButton(
+                            onPressed: _convertCurrency,
+                            child: const Text('Convert'),
+                          ),
+                        ],
+                      ),
+                      Consumer(
+                        builder: (context, ref, child) {
+                          final state = ref.watch(currencyProvider);
+                          if (state.status == CurrencyStateStatus.loading) {
+                            return const Padding(
+                              padding: EdgeInsets.only(top: 8.0),
+                              child: Center(child: CircularProgressIndicator()),
+                            );
+                          } else if (state.status ==
+                              CurrencyStateStatus.error) {
+                            return Padding(
+                              padding: const EdgeInsets.only(top: 8.0),
+                              child: Row(
+                                children: [
+                                  const Icon(
+                                    Icons.error,
+                                    color: Colors.red,
+                                    size: 16,
+                                  ),
+                                  const SizedBox(width: 4),
+                                  Expanded(
+                                    child: Text(
+                                      state.errorMessage ?? 'API Error',
+                                      style: const TextStyle(
+                                        color: Colors.red,
+                                        fontSize: 12,
+                                      ),
+                                    ),
+                                  ),
+                                  TextButton(
+                                    onPressed: _convertCurrency,
+                                    child: const Text('Retry'),
+                                  ),
+                                ],
+                              ),
+                            );
+                          }
+                          return const SizedBox.shrink();
+                        },
                       ),
                     ],
                   ],
@@ -296,15 +387,22 @@ class _AddExpensesScreenState extends ConsumerState<AddExpensesScreen> {
                       ],
                     ),
                     const SizedBox(height: 8),
-                    
+
                     // Select All Checkbox
                     CheckboxListTile(
-                      title: const Text('Select All', style: TextStyle(fontWeight: FontWeight.bold)),
-                      value: _selectedParticipantIds.length == hangoutPeople.length,
+                      title: const Text(
+                        'Select All',
+                        style: TextStyle(fontWeight: FontWeight.bold),
+                      ),
+                      value:
+                          _selectedParticipantIds.length ==
+                          hangoutPeople.length,
                       onChanged: (selected) {
                         setState(() {
                           if (selected == true) {
-                            _selectedParticipantIds.addAll(hangoutPeople.map((p) => p.id));
+                            _selectedParticipantIds.addAll(
+                              hangoutPeople.map((p) => p.id),
+                            );
                           } else {
                             _selectedParticipantIds.clear();
                           }
