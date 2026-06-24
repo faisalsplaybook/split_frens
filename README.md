@@ -11,7 +11,6 @@ A Flutter expense-splitting app for friend groups, hangouts, and trips. Track sh
 - **Settlements** — View and mark settlements as paid/unpaid
 - **Currency Converter** — Convert foreign expenses via ExchangeRate-API (travel mode)
 - **Share Summary** — Share a formatted text summary via any app (WhatsApp, etc.)
-- **History** — View completed/archived hangouts
 - **Settings** — Configure default currency and app preferences
 - **Persistent Storage** — All data saved locally with Hive
 
@@ -132,13 +131,11 @@ lib/
 - **Equal split only** — Phase 1 only supports equal splitting among participants
 - **No authentication** — All data is local, no cloud sync or user accounts
 - **Free API tier** — Currency conversion limited to 1,500 requests/month
-- **No dark mode** — Light theme only (dark mode planned for V2)
 - **Offline-only** — No real-time sync between devices
 
 ## Future Improvements
 
 - Unequal / percentage-based splits
-- Dark mode theme
 - Firebase Auth + Firestore cloud sync
 - Push notifications for settlement reminders
 - Expense categories with icons

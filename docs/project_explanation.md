@@ -69,7 +69,6 @@ Navigation uses **go_router** with a flat route structure. Dynamic segments (`:h
 | `/splash` | SplashScreen (Hive init) |
 | `/` | HomeScreen |
 | `/create-hangout` | CreateHangoutScreen |
-| `/history` | HistoryScreen |
 | `/settings` | SettingsScreen |
 | `/hangout/:hangoutId` | HangoutDetailScreen |
 | `/hangout/:hangoutId/add-people` | AddPeopleScreen |
@@ -170,12 +169,11 @@ The app handles the following edge cases:
 ## What I Would Improve
 
 1. **Unequal splits** — Support percentage-based or exact-amount splitting
-2. **Dark mode** — Add a complete dark theme variant
-3. **Firebase integration** — Auth + Firestore for cloud sync across devices
-4. **Push notifications** — Settlement reminders for outstanding debts
-5. **Expense categories** — Visual categorization with icons (food, transport, etc.)
-6. **Receipt photos** — Attach images to expenses for reference
-7. **Export** — CSV/PDF export of hangout summaries
-8. **Widget tests** — Add widget-level and integration tests for UI flows
-9. **Freezed models** — Migrate to code-generated immutable models
-10. **Localization** — Multi-language support (i18n)
+2. **Firebase integration** — Auth + Firestore for cloud sync across devices
+3. **Push notifications** — Settlement reminders for outstanding debts
+4. **Expense categories** — Visual categorization with icons (food, transport, etc.)
+5. **Receipt photos** — Attach images to expenses for reference
+6. **Export** — CSV/PDF export of hangout summaries
+7. **Widget tests** — Add widget-level and integration tests for UI flows
+8. **Freezed models** — Migrate to code-generated immutable models
+9. **Localization** — Multi-language support (i18n)
