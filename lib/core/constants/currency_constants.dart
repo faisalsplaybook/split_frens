@@ -1,12 +1,8 @@
 class CurrencyConstants {
   static const List<String> supportedCurrencies = [
-    'BDT',
-    'USD',
-    'EUR',
-    'GBP',
-    'INR',
-    'SAR',
-    'AED',
-    'MYR',
+    'USD', 'EUR', 'GBP', 'JPY', 'AUD', 'CAD', 'CHF', 'CNY', 'HKD', 'NZD',
+    'SEK', 'KRW', 'SGD', 'NOK', 'MXN', 'INR', 'RUB', 'ZAR', 'TRY', 'BRL',
+    'TWD', 'DKK', 'PLN', 'THB', 'IDR', 'HUF', 'CZK', 'ILS', 'CLP', 'PHP',
+    'AED', 'COP', 'SAR', 'MYR', 'RON', 'BDT', 'PKR', 'LKR', 'NPR', 'VND'
   ];
 }

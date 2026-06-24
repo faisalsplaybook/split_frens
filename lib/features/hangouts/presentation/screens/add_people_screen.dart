@@ -39,29 +39,46 @@ class _AddPeopleScreenState extends ConsumerState<AddPeopleScreen> {
       final name = _nameController.text.trim();
       final contactInfo = _contactController.text.trim();
 
-      // Check if person already exists globally (to block duplicates)
+      // 1. Check if person already exists in THIS hangout
+      final hangout = ref.read(hangoutsProvider).firstWhere((h) => h.id == widget.hangoutId);
       final allPeople = ref.read(personsProvider);
-      final isDuplicate = allPeople.any((p) => p.name.toLowerCase() == name.toLowerCase());
+      
+      final isDuplicateInHangout = hangout.participantIds.any((id) {
+        // Safety check in case a participant ID doesn't exist in allPeople
+        try {
+          final p = allPeople.firstWhere((person) => person.id == id);
+          return p.name.toLowerCase() == name.toLowerCase();
+        } catch (e) {
+          return false;
+        }
+      });
 
-      if (isDuplicate) {
+      if (isDuplicateInHangout) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('A person with this name already exists!')),
+          const SnackBar(content: Text('A person with this name is already in this hangout!')),
         );
         return;
       }
 
-      // 1. Create the new person
-      final newPerson = PersonModel(
-        id: const Uuid().v4(),
-        name: name,
-        contactInfo: contactInfo.isNotEmpty ? contactInfo : null,
-      );
+      // 2. Check if the person exists globally but not in this hangout
+      final existingPerson = allPeople.where((p) => p.name.toLowerCase() == name.toLowerCase()).firstOrNull;
 
-      // 2. Add to global persons list
-      ref.read(personsProvider.notifier).addPerson(newPerson);
+      if (existingPerson != null) {
+        // Reuse the existing person
+        ref.read(hangoutsProvider.notifier).addPerson(widget.hangoutId, existingPerson.id);
+      } else {
+        // 3. Create the new person globally
+        final newPerson = PersonModel(
+          id: const Uuid().v4(),
+          name: name,
+          contactInfo: contactInfo.isNotEmpty ? contactInfo : null,
+        );
 
-      // 3. Add to this specific hangout
-      ref.read(hangoutsProvider.notifier).addPerson(widget.hangoutId, newPerson.id);
+        ref.read(personsProvider.notifier).addPerson(newPerson);
+        
+        // 4. Add new person to this specific hangout
+        ref.read(hangoutsProvider.notifier).addPerson(widget.hangoutId, newPerson.id);
+      }
 
       // 4. Clear the form
       _nameController.clear();
