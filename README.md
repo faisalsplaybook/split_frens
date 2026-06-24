@@ -2,6 +2,20 @@
 
 A Flutter expense-splitting app for friend groups, hangouts, and trips. Track shared expenses, calculate who owes whom, manage settlements, and share summaries — all from one place.
 
+## Screenshots
+
+| Home | Hangout Details | Add Expense |
+|:---:|:---:|:---:|
+| ![Home](docs/screenshots/01_home_screen.png) | ![Hangout Details](docs/screenshots/03_hangout_details.png) | ![Add Expense](docs/screenshots/05_add_expense.png) |
+
+| Travel Mode (Add) | Currency Converter | Travel Mode (Split) |
+|:---:|:---:|:---:|
+| ![Travel Mode Add](docs/screenshots/09_add_expense_travel_mode.png) | ![Currency Converter](docs/screenshots/10_currency_converter.png) | ![Travel Mode Split](docs/screenshots/13_split_results_travel_mode.png) |
+
+| Expense Details | Settlements | Add People & Settings |
+|:---:|:---:|:---:|
+| ![Expense Details](docs/screenshots/14_expense_details_travel_mode.png) | ![Settlements](docs/screenshots/08_settlements.png) | ![Add People](docs/screenshots/04_add_people.png) |
+
 ## Main Features
 
 - **Create Hangouts** — Group expenses by event (dinner, trip, outing)
@@ -9,7 +23,7 @@ A Flutter expense-splitting app for friend groups, hangouts, and trips. Track sh
 - **Add Expenses** — Log who paid, select participants, equal split calculation
 - **Split Results** — See individual balances (who gets back / who owes)
 - **Settlements** — View and mark settlements as paid/unpaid
-- **Currency Converter** — Convert foreign expenses via ExchangeRate-API (travel mode)
+- **Travel Mode (Currency Converter)** — Seamlessly add expenses in foreign currencies during a trip. The app fetches live exchange rates (via ExchangeRate-API) to convert the expense into your default currency. It intuitively displays both currencies across the app (in expense details, split results, and settlements) so everyone understands exactly what was spent and owed in both local and home currencies.
 - **Share Summary** — Share a formatted text summary via any app (WhatsApp, etc.)
 - **Settings** — Configure default currency and app preferences
 - **Persistent Storage** — All data saved locally with Hive
