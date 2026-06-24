@@ -11,7 +11,7 @@ import '../providers/hangout_provider.dart';
 import '../providers/person_provider.dart';
 import '../providers/expense_provider.dart';
 import '../../../../core/constants/currency_constants.dart';
-import '../../../settings/data/services/settings_service.dart';
+import '../../../../core/utils/money_formatter.dart';
 import '../../../currency/presentation/providers/currency_provider.dart';
 
 // ==========================================
@@ -119,14 +119,15 @@ class _AddExpensesScreenState extends ConsumerState<AddExpensesScreen> {
       return;
     }
 
-    final baseCurrency = SettingsService.getDefaultCurrency();
+    final hangout = ref.read(hangoutsProvider).firstWhere((h) => h.id == widget.hangoutId);
+    final fromCurr = hangout.defaultCurrency ?? CurrencyConstants.supportedCurrencies.first;
 
     await ref
         .read(currencyProvider.notifier)
         .convert(
           amount: amount,
-          fromCurrency: _selectedCurrency,
-          toCurrency: baseCurrency,
+          fromCurrency: fromCurr,
+          toCurrency: _selectedCurrency,
         );
 
     final state = ref.read(currencyProvider);
@@ -214,7 +215,8 @@ class _AddExpensesScreenState extends ConsumerState<AddExpensesScreen> {
                       controller: _amountController,
                       label: 'Amount',
                       hint: '0.00',
-                      prefixIcon: Icons.attach_money,
+                      prefixText: '${MoneyFormatter.getSymbol(
+                          currencyCode: hangout.defaultCurrency)} ',
                       keyboardType: const TextInputType.numberWithOptions(
                         decimal: true,
                       ),
@@ -266,7 +268,7 @@ class _AddExpensesScreenState extends ConsumerState<AddExpensesScreen> {
                             child: AppTextField(
                               controller: _convertedAmountController,
                               label:
-                                  'Converted Amount (${SettingsService.getDefaultCurrency()})',
+                                  'Converted Amount ($_selectedCurrency)',
                               hint: '0.00',
                               prefixIcon: Icons.currency_exchange,
                               keyboardType:

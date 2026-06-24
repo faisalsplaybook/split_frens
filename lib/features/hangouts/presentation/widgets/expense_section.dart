@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../../core/utils/money_formatter.dart';
 import '../../data/models/hangout_model.dart';
 import '../../data/models/person_model.dart';
 import '../providers/expense_provider.dart';
@@ -55,12 +56,8 @@ class ExpenseSection extends ConsumerWidget {
               // Get Payer Name safely
               final payer = allPeople.firstWhere(
                 (p) => p.id == expense.paidById,
-                orElse: () =>
-                    PersonModel(id: expense.paidById, name: 'Unknown'),
+                orElse: () => PersonModel(id: expense.paidById, name: 'Unknown'),
               );
-
-              // Currency prefix (fallback to \$ if none)
-              final currencySymbol = expense.currency ?? '\$';
 
               return Card(
                 child: ListTile(
@@ -74,7 +71,7 @@ class ExpenseSection extends ConsumerWidget {
                     'Paid by ${payer.name} • ${expense.participantIds.length} participants',
                   ),
                   trailing: Text(
-                    '$currencySymbol${expense.amount.toStringAsFixed(2)}',
+                    MoneyFormatter.format(expense.amount, currencyCode: hangout.defaultCurrency),
                     style: const TextStyle(
                       fontWeight: FontWeight.bold,
                       fontSize: 16,

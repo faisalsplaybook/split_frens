@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 
+import '../../../../core/utils/money_formatter.dart';
+import '../../data/models/hangout_model.dart';
 import '../../data/models/person_model.dart';
+import '../../data/services/split_calculator_service.dart';
 
 // ==========================================
 // Balance Summary Section Widget
@@ -11,6 +14,8 @@ class BalanceSummarySection extends StatelessWidget {
   final int totalExpenses;
   final Map<String, double> netBalances;
   final List<PersonModel> allPeople;
+  final HangoutModel hangout;
+  final SplitCalculatorService calculator;
 
   const BalanceSummarySection({
     super.key,
@@ -18,6 +23,8 @@ class BalanceSummarySection extends StatelessWidget {
     required this.totalExpenses,
     required this.netBalances,
     required this.allPeople,
+    required this.hangout,
+    required this.calculator,
   });
 
   String _getPersonName(String personId) {
@@ -31,6 +38,8 @@ class BalanceSummarySection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final convertedTotals = calculator.calculateTotalConverted(hangout);
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -47,13 +56,23 @@ class BalanceSummarySection extends StatelessWidget {
                 ),
                 const SizedBox(height: 8),
                 Text(
-                  '\$${totalSpent.toStringAsFixed(2)}',
+                  MoneyFormatter.format(totalSpent, currencyCode: hangout.defaultCurrency),
                   style: TextStyle(
                     fontSize: 36,
                     fontWeight: FontWeight.bold,
                     color: Theme.of(context).colorScheme.onPrimaryContainer,
                   ),
                 ),
+                if (convertedTotals.isNotEmpty) ...[
+                  const SizedBox(height: 4),
+                  ...convertedTotals.entries.map((e) => Text(
+                    '(${MoneyFormatter.format(e.value, currencyCode: e.key)})',
+                    style: TextStyle(
+                      fontSize: 16,
+                      color: Theme.of(context).colorScheme.onPrimaryContainer.withValues(alpha: 0.8),
+                    ),
+                  )),
+                ],
                 const SizedBox(height: 8),
                 Text(
                   '$totalExpenses Expenses',
@@ -102,6 +121,8 @@ class BalanceSummarySection extends StatelessWidget {
               );
             }
 
+            final ratio = totalSpent > 0 ? balance.abs() / totalSpent : 0.0;
+
             return ListTile(
               leading: CircleAvatar(child: Text(name[0].toUpperCase())),
               title: Text(
@@ -115,13 +136,24 @@ class BalanceSummarySection extends StatelessWidget {
                   fontWeight: FontWeight.w500,
                 ),
               ),
-              trailing: Text(
-                '\$${balance.abs().toStringAsFixed(2)}',
-                style: TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.bold,
-                  color: balanceColor,
-                ),
+              trailing: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.end,
+                children: [
+                  Text(
+                    MoneyFormatter.format(balance.abs(), currencyCode: hangout.defaultCurrency),
+                    style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                      color: balanceColor,
+                    ),
+                  ),
+                  if (ratio > 0 && convertedTotals.isNotEmpty)
+                     ...convertedTotals.entries.map((e) => Text(
+                       MoneyFormatter.format(e.value * ratio, currencyCode: e.key),
+                       style: TextStyle(fontSize: 12, color: balanceColor.withValues(alpha: 0.8)),
+                     )),
+                ],
               ),
             );
           }),

@@ -7,6 +7,7 @@ import 'package:uuid/uuid.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../data/models/hangout_model.dart';
 import '../providers/hangout_provider.dart';
+import '../../../settings/data/services/settings_service.dart';
 
 // ==========================================
 // Create Hangout Screen
@@ -36,8 +37,6 @@ class _CreateHangoutScreenState extends ConsumerState<CreateHangoutScreen> {
   // 3. State Variables
   // Variables to hold the dropdown and toggle selections
   String _selectedType = 'Hangout';
-  bool _isTravelMode = false;
-  String? _selectedCurrency;
 
   @override
   void dispose() {
@@ -65,6 +64,7 @@ class _CreateHangoutScreenState extends ConsumerState<CreateHangoutScreen> {
         // As requested for Day 4: keep people and expenses empty!
         participantIds: [],
         expenseIds: [],
+        defaultCurrency: SettingsService.getDefaultCurrency(),
       );
 
       // 3. Add it to our central state (Riverpod) instead of the local DummyData list!
@@ -139,51 +139,8 @@ class _CreateHangoutScreenState extends ConsumerState<CreateHangoutScreen> {
                 },
               ),
 
-              // ==========================================
-              // 4. Travel Mode Toggle
-              // ==========================================
-              // SwitchListTile is a built-in widget that perfectly combines
-              // text and a toggle switch into one row.
-              SwitchListTile(
-                title: const Text('Enable Travel Mode'),
-                subtitle: const Text('Allows tracking in foreign currencies'),
-                value: _isTravelMode,
-                // Moves the switch to the left instead of the far right
-                contentPadding: EdgeInsets.zero,
-                onChanged: (value) {
-                  setState(() {
-                    _isTravelMode = value;
-                    // If we turn off travel mode, clear the currency selection
-                    if (!value) {
-                      _selectedCurrency = null;
-                    }
-                  });
-                },
-              ),
-              const SizedBox(height: 16),
-
-              // ==========================================
-              // 5. Base Currency (Conditional)
-              // ==========================================
-              // We only show this Dropdown IF travel mode is true!
-              if (_isTravelMode)
-                AppDropdown<String>(
-                  label: 'Base Currency',
-                  value: _selectedCurrency,
-                  items: const [
-                    DropdownMenuItem(value: 'USD', child: Text('USD (\$)')),
-                    DropdownMenuItem(value: 'EUR', child: Text('EUR (€)')),
-                    DropdownMenuItem(value: 'GBP', child: Text('GBP (£)')),
-                  ],
-                  onChanged: (value) {
-                    setState(() {
-                      _selectedCurrency = value;
-                    });
-                  },
-                  // Validate that they actually picked one!
-                  validator: (value) =>
-                      AppValidators.validateCurrency(value, _isTravelMode),
-                ),
+              // Removed Travel Mode toggle and conditional Base Currency dropdown
+              // because currency conversion is handled per-expense in AddExpensesScreen.
 
               const SizedBox(height: 32),
 

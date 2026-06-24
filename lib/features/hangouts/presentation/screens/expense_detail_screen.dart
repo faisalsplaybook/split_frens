@@ -2,8 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../core/utils/date_formatter.dart';
+import '../../../../core/utils/money_formatter.dart';
 import '../../data/models/person_model.dart';
 import '../providers/expense_provider.dart';
+import '../providers/hangout_provider.dart';
 import '../providers/person_provider.dart';
 
 // ==========================================
@@ -29,6 +31,12 @@ class ExpenseDetailScreen extends ConsumerWidget {
           orElse: () => throw Exception('Expense not found'),
         );
 
+    // Fetch the hangout
+    final hangout = ref.watch(hangoutsProvider).firstWhere(
+          (h) => h.id == hangoutId,
+          orElse: () => throw Exception('Hangout not found'),
+        );
+
     // 2. Fetch people
     final allPeople = ref.watch(personsProvider);
     final payer = allPeople.firstWhere(
@@ -51,10 +59,15 @@ class ExpenseDetailScreen extends ConsumerWidget {
         : expense.amount / participants.length;
 
     // Formatting currency
-    final currencySymbol = expense.currency ?? '\$';
-    final formattedAmount =
-        '$currencySymbol${expense.amount.toStringAsFixed(2)}';
-    final formattedShare = '$currencySymbol${shareAmount.toStringAsFixed(2)}';
+    final formattedAmount = MoneyFormatter.format(expense.amount, currencyCode: hangout.defaultCurrency);
+    final formattedShare = MoneyFormatter.format(shareAmount, currencyCode: hangout.defaultCurrency);
+
+    final convertedShareAmount = expense.convertedAmount != null && participants.isNotEmpty
+        ? expense.convertedAmount! / participants.length
+        : null;
+    final formattedConvertedShare = convertedShareAmount != null && expense.currency != null
+        ? MoneyFormatter.format(convertedShareAmount, currencyCode: expense.currency)
+        : null;
 
     return Scaffold(
       appBar: AppBar(
@@ -103,7 +116,7 @@ class ExpenseDetailScreen extends ConsumerWidget {
                   if (expense.convertedAmount != null) ...[
                     const SizedBox(height: 8),
                     Text(
-                      'Converted: \$${expense.convertedAmount!.toStringAsFixed(2)}',
+                      'Converted: ${MoneyFormatter.format(expense.convertedAmount!, currencyCode: expense.currency)}',
                       style: const TextStyle(fontSize: 16, color: Colors.grey),
                     ),
                   ],
@@ -189,13 +202,23 @@ class ExpenseDetailScreen extends ConsumerWidget {
                           fontWeight: FontWeight.bold,
                         ),
                       ),
-                      Text(
-                        '$formattedShare / person',
-                        style: TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.bold,
-                          color: Theme.of(context).colorScheme.primary,
-                        ),
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.end,
+                        children: [
+                          Text(
+                            '$formattedShare / person',
+                            style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                              color: Theme.of(context).colorScheme.primary,
+                            ),
+                          ),
+                          if (formattedConvertedShare != null)
+                            Text(
+                              '$formattedConvertedShare / person',
+                              style: const TextStyle(fontSize: 12, color: Colors.grey),
+                            ),
+                        ],
                       ),
                     ],
                   ),
@@ -223,9 +246,20 @@ class ExpenseDetailScreen extends ConsumerWidget {
                         ),
                       ),
                       title: Text(person.name),
-                      trailing: Text(
-                        formattedShare,
-                        style: const TextStyle(fontWeight: FontWeight.w500),
+                      trailing: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        crossAxisAlignment: CrossAxisAlignment.end,
+                        children: [
+                          Text(
+                            formattedShare,
+                            style: const TextStyle(fontWeight: FontWeight.w500),
+                          ),
+                          if (formattedConvertedShare != null)
+                            Text(
+                              formattedConvertedShare,
+                              style: const TextStyle(fontSize: 12, color: Colors.grey),
+                            ),
+                        ],
                       ),
                     );
                   }),

@@ -14,6 +14,9 @@ class HangoutModel {
   // The IDs of settlements that have been marked as paid
   final List<String> paidSettlementIds;
 
+  // The currency in which this hangout was created
+  final String? defaultCurrency;
+
   HangoutModel({
     required this.id,
     required this.title,
@@ -22,6 +25,7 @@ class HangoutModel {
     required this.participantIds,
     required this.expenseIds,
     this.paidSettlementIds = const [],
+    this.defaultCurrency,
   });
 
   HangoutModel copyWith({
@@ -32,6 +36,7 @@ class HangoutModel {
     List<String>? participantIds,
     List<String>? expenseIds,
     List<String>? paidSettlementIds,
+    String? defaultCurrency,
   }) {
     return HangoutModel(
       id: id ?? this.id,
@@ -41,6 +46,7 @@ class HangoutModel {
       participantIds: participantIds ?? this.participantIds,
       expenseIds: expenseIds ?? this.expenseIds,
       paidSettlementIds: paidSettlementIds ?? this.paidSettlementIds,
+      defaultCurrency: defaultCurrency ?? this.defaultCurrency,
     );
   }
 
@@ -52,6 +58,7 @@ class HangoutModel {
         'participantIds': participantIds,
         'expenseIds': expenseIds,
         'paidSettlementIds': paidSettlementIds,
+        'defaultCurrency': defaultCurrency,
       };
 
   factory HangoutModel.fromJson(Map<String, dynamic> json) => HangoutModel(
@@ -65,5 +72,6 @@ class HangoutModel {
         expenseIds: List<String>.from(json['expenseIds'] as List),
         paidSettlementIds: List<String>.from(
             json['paidSettlementIds'] as List? ?? []),
+        defaultCurrency: json['defaultCurrency'] as String?,
       );
 }

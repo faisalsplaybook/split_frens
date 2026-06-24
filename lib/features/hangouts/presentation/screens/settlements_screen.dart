@@ -73,6 +73,7 @@ class SettlementsScreen extends ConsumerWidget {
         people: hangoutPeople,
         settlements: settlements,
         totalExpense: totalSpent,
+        calculator: calculator,
       );
 
       // ignore: deprecated_member_use
@@ -126,6 +127,9 @@ class SettlementsScreen extends ConsumerWidget {
                       return SettlementCard(
                         settlement: settlement,
                         allPeople: allPeople,
+                        hangout: hangout,
+                        calculator: calculator,
+                        totalSpent: calculator.calculateTotalSpent(hangout),
                         onTogglePaid: () {
                           final notifier =
                               ref.read(hangoutsProvider.notifier);

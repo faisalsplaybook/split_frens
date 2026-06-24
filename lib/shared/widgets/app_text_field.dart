@@ -14,6 +14,7 @@ class AppTextField extends StatelessWidget {
   final TextInputType keyboardType;
   final int maxLines;
   final IconData? prefixIcon;
+  final String? prefixText;
 
   const AppTextField({
     super.key,
@@ -24,6 +25,7 @@ class AppTextField extends StatelessWidget {
     this.keyboardType = TextInputType.text,
     this.maxLines = 1,
     this.prefixIcon,
+    this.prefixText,
   });
 
   @override
@@ -48,6 +50,7 @@ class AppTextField extends StatelessWidget {
           filled: true,
           fillColor: Colors.grey.shade50,
           prefixIcon: prefixIcon != null ? Icon(prefixIcon) : null,
+          prefixText: prefixText,
         ),
       ),
     );

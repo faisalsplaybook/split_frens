@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
 
+import '../../../../core/utils/money_formatter.dart';
+import '../../data/models/hangout_model.dart';
 import '../../data/models/person_model.dart';
 import '../../data/models/settlement_model.dart';
+import '../../data/services/split_calculator_service.dart';
 
 // ==========================================
 // Settlement Card Widget
@@ -12,12 +15,18 @@ class SettlementCard extends StatelessWidget {
   final SettlementModel settlement;
   final List<PersonModel> allPeople;
   final VoidCallback onTogglePaid;
+  final HangoutModel hangout;
+  final SplitCalculatorService calculator;
+  final double totalSpent;
 
   const SettlementCard({
     super.key,
     required this.settlement,
     required this.allPeople,
     required this.onTogglePaid,
+    required this.hangout,
+    required this.calculator,
+    required this.totalSpent,
   });
 
   String _getPersonName(String personId) {
@@ -44,6 +53,9 @@ class SettlementCard extends StatelessWidget {
     final iconColor = isPaid ? Colors.green : Theme.of(context).colorScheme.error;
     final iconData = isPaid ? Icons.check_circle : Icons.warning_amber_rounded;
 
+    final convertedTotals = calculator.calculateTotalConverted(hangout);
+    final ratio = totalSpent > 0 ? settlement.amount / totalSpent : 0.0;
+
     return Card(
       color: cardColor,
       margin: const EdgeInsets.only(bottom: 16.0),
@@ -64,13 +76,26 @@ class SettlementCard extends StatelessWidget {
                   ),
                 ),
                 const Spacer(),
-                Text(
-                  '\$${settlement.amount.toStringAsFixed(2)}',
-                  style: TextStyle(
-                    fontSize: 24,
-                    fontWeight: FontWeight.bold,
-                    color: textColor,
-                  ),
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.end,
+                  children: [
+                    Text(
+                      MoneyFormatter.format(settlement.amount, currencyCode: hangout.defaultCurrency),
+                      style: TextStyle(
+                        fontSize: 24,
+                        fontWeight: FontWeight.bold,
+                        color: textColor,
+                      ),
+                    ),
+                    if (ratio > 0 && convertedTotals.isNotEmpty)
+                      ...convertedTotals.entries.map((e) => Text(
+                        MoneyFormatter.format(e.value * ratio, currencyCode: e.key),
+                        style: TextStyle(
+                          fontSize: 14,
+                          color: textColor.withValues(alpha: 0.8),
+                        ),
+                      )),
+                  ],
                 ),
               ],
             ),

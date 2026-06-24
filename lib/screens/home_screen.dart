@@ -17,7 +17,6 @@ class HomeScreen extends ConsumerWidget {
     // Sort by most recent first, then take the first 3
     final recentHangouts = [...hangouts]
       ..sort((a, b) => b.startDate.compareTo(a.startDate));
-    final preview = recentHangouts.take(3).toList();
 
     return Scaffold(
       appBar: AppBar(
@@ -42,7 +41,7 @@ class HomeScreen extends ConsumerWidget {
             Expanded(
               child: hangouts.isEmpty
                   ? _buildEmptyState(context)
-                  : _buildRecentHangouts(context, preview, hangouts.length),
+                  : _buildRecentHangouts(context, recentHangouts, hangouts.length),
             ),
 
             // ==========================================
@@ -59,20 +58,6 @@ class HomeScreen extends ConsumerWidget {
                   context.push('/create-hangout');
                 },
                 child: const Text('Create Hangout'),
-              ),
-            ),
-
-            const SizedBox(height: 12),
-
-            // Secondary CTA
-            SizedBox(
-              width: double.infinity,
-              child: OutlinedButton(
-                onPressed: () {
-                  // Navigate to the History screen
-                  context.push('/history');
-                },
-                child: const Text('View History'),
               ),
             ),
             const SizedBox(height: 16), // A little padding at the very bottom
@@ -118,14 +103,9 @@ class HomeScreen extends ConsumerWidget {
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             const Text(
-              'Recent Hangouts',
+              'Your Hangouts',
               style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
             ),
-            if (totalCount > 3)
-              TextButton(
-                onPressed: () => context.push('/history'),
-                child: const Text('See all'),
-              ),
           ],
         ),
         const SizedBox(height: 12),

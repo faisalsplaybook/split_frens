@@ -138,6 +138,7 @@ class HangoutDetailScreen extends ConsumerWidget {
                     people: hangoutPeople,
                     settlements: settlements,
                     totalExpense: totalSpent,
+                    calculator: calculator,
                   );
 
                   // ignore: deprecated_member_use

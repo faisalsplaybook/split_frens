@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:share_plus/share_plus.dart';
 
+import '../../../../core/utils/money_formatter.dart';
 import '../../../../core/utils/summary_generator.dart';
 import '../../data/models/expense_model.dart';
 import '../../data/models/hangout_model.dart';
 import '../../data/models/person_model.dart';
 import '../../data/models/settlement_model.dart';
+import '../../data/services/split_calculator_service.dart';
 
 // ==========================================
 // Settlement Preview Section Widget
@@ -18,6 +20,7 @@ class SettlementPreviewSection extends StatelessWidget {
   final List<PersonModel> allPeople;
   final List<ExpenseModel> allExpenses;
   final double totalSpent;
+  final SplitCalculatorService calculator;
 
   const SettlementPreviewSection({
     super.key,
@@ -26,6 +29,7 @@ class SettlementPreviewSection extends StatelessWidget {
     required this.allPeople,
     required this.allExpenses,
     required this.totalSpent,
+    required this.calculator,
   });
 
   String _getPersonName(String personId) {
@@ -39,6 +43,8 @@ class SettlementPreviewSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final convertedTotals = calculator.calculateTotalConverted(hangout);
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -63,6 +69,7 @@ class SettlementPreviewSection extends StatelessWidget {
           ...settlements.map((settlement) {
             final debtorName = _getPersonName(settlement.payerId);
             final creditorName = _getPersonName(settlement.payeeId);
+            final ratio = totalSpent > 0 ? settlement.amount / totalSpent : 0.0;
 
             return Card(
               child: ListTile(
@@ -88,13 +95,24 @@ class SettlementPreviewSection extends StatelessWidget {
                     ],
                   ),
                 ),
-                trailing: Text(
-                  '\$${settlement.amount.toStringAsFixed(2)}',
-                  style: const TextStyle(
-                    fontWeight: FontWeight.bold,
-                    fontSize: 16,
-                    color: Colors.redAccent,
-                  ),
+                trailing: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.end,
+                  children: [
+                    Text(
+                      MoneyFormatter.format(settlement.amount, currencyCode: hangout.defaultCurrency),
+                      style: const TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 16,
+                        color: Colors.redAccent,
+                      ),
+                    ),
+                    if (ratio > 0 && convertedTotals.isNotEmpty)
+                       ...convertedTotals.entries.map((e) => Text(
+                         MoneyFormatter.format(e.value * ratio, currencyCode: e.key),
+                         style: TextStyle(fontSize: 12, color: Colors.redAccent.withValues(alpha: 0.8)),
+                       )),
+                  ],
                 ),
               ),
             );
@@ -129,6 +147,7 @@ class SettlementPreviewSection extends StatelessWidget {
                 people: hangoutPeople,
                 settlements: settlements,
                 totalExpense: totalSpent,
+                calculator: calculator,
               );
 
               // ignore: deprecated_member_use

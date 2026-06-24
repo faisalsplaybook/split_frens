@@ -6,6 +6,7 @@ import '../../../hangouts/presentation/providers/expense_provider.dart';
 import '../../../hangouts/presentation/providers/hangout_provider.dart';
 import '../../../hangouts/presentation/providers/person_provider.dart';
 import '../../data/services/settings_service.dart';
+import '../../../../core/constants/currency_constants.dart';
 
 // ==========================================
 // Settings Screen
@@ -37,20 +38,29 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
   }
 
   void _showCurrencyDialog() {
-    final controller = TextEditingController(text: _currentCurrency);
     showDialog(
       context: context,
       builder: (context) {
         return AlertDialog(
           title: const Text('Default Currency'),
-          content: TextField(
-            controller: controller,
-            decoration: const InputDecoration(
-              labelText: 'Currency Code',
-              hintText: 'USD, EUR, GBP...',
-            ),
-            textCapitalization: TextCapitalization.characters,
-            maxLength: 3,
+          content: StatefulBuilder(
+            builder: (BuildContext context, StateSetter setStateDialog) {
+              return DropdownButtonFormField<String>(
+                decoration: const InputDecoration(
+                  labelText: 'Currency Code',
+                  border: OutlineInputBorder(),
+                ),
+                initialValue: _currentCurrency,
+                items: CurrencyConstants.supportedCurrencies
+                    .map((c) => DropdownMenuItem(value: c, child: Text(c)))
+                    .toList(),
+                onChanged: (val) {
+                  if (val != null) {
+                    setStateDialog(() => _currentCurrency = val);
+                  }
+                },
+              );
+            },
           ),
           actions: [
             TextButton(
@@ -59,7 +69,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
             ),
             FilledButton(
               onPressed: () {
-                _updateCurrency(controller.text);
+                _updateCurrency(_currentCurrency);
                 Navigator.pop(context);
               },
               child: const Text('Save'),

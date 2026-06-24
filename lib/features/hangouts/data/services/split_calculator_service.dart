@@ -14,20 +14,31 @@ class SplitCalculatorService {
 
   SplitCalculatorService({required this.allExpenses});
 
-  /// 1. Calculates the total amount spent across all expenses in a hangout
+  /// 1. Calculates the total amount spent across all expenses in a hangout (in base currency)
   double calculateTotalSpent(HangoutModel hangout) {
     double total = 0.0;
     for (final expenseId in hangout.expenseIds) {
       final expense = _getExpense(expenseId);
       if (expense != null) {
-        final effectiveAmount = expense.convertedAmount ?? expense.amount;
-        total += effectiveAmount;
+        total += expense.amount;
       }
     }
     return total;
   }
 
-  /// 2. Calculates how much each person actually paid out of pocket
+  /// Calculates the total converted amounts grouped by currency
+  Map<String, double> calculateTotalConverted(HangoutModel hangout) {
+    final totals = <String, double>{};
+    for (final expenseId in hangout.expenseIds) {
+      final expense = _getExpense(expenseId);
+      if (expense != null && expense.convertedAmount != null && expense.currency != null) {
+        totals[expense.currency!] = (totals[expense.currency!] ?? 0.0) + expense.convertedAmount!;
+      }
+    }
+    return totals;
+  }
+
+  /// 2. Calculates how much each person actually paid out of pocket (in base currency)
   Map<String, double> calculatePaidAmounts(HangoutModel hangout) {
     final paidAmounts = <String, double>{};
 
@@ -41,9 +52,8 @@ class SplitCalculatorService {
       final expense = _getExpense(expenseId);
       if (expense != null &&
           hangout.participantIds.contains(expense.paidById)) {
-        final effectiveAmount = expense.convertedAmount ?? expense.amount;
         paidAmounts[expense.paidById] =
-            (paidAmounts[expense.paidById] ?? 0.0) + effectiveAmount;
+            (paidAmounts[expense.paidById] ?? 0.0) + expense.amount;
       }
     }
 
@@ -167,11 +177,10 @@ class SplitCalculatorService {
     return settlements;
   }
 
-  /// 6. Helper to calculate a single expense's per-person share
+  /// 6. Helper to calculate a single expense's per-person share (in base currency)
   double calculatePerPersonShare(ExpenseModel expense) {
     if (expense.participantIds.isEmpty) return 0.0;
-    final effectiveAmount = expense.convertedAmount ?? expense.amount;
-    return effectiveAmount / expense.participantIds.length;
+    return expense.amount / expense.participantIds.length;
   }
 
   // Helper to safely get an expense

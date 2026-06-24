@@ -17,8 +17,6 @@ import '../../features/hangouts/presentation/screens/add_expenses_screen.dart';
 import '../../features/hangouts/presentation/screens/expense_detail_screen.dart';
 import '../../features/hangouts/presentation/screens/split_results_screen.dart';
 import '../../features/hangouts/presentation/screens/settlements_screen.dart';
-import '../../features/hangouts/presentation/screens/history_screen.dart';
-
 // Currency Feature Screens
 import '../../features/currency/presentation/screens/currency_converter_screen.dart';
 
@@ -49,10 +47,6 @@ final appRouterProvider = Provider<GoRouter>((ref) {
         builder: (context, state) => const CreateHangoutScreen(),
       ),
 
-      GoRoute(
-        path: '/history',
-        builder: (context, state) => const HistoryScreen(),
-      ),
 
       GoRoute(
         path: '/settings',

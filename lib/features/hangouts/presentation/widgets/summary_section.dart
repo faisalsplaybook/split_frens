@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../../core/utils/money_formatter.dart';
 import '../../data/models/hangout_model.dart';
 import '../../data/services/split_calculator_service.dart';
 import '../providers/expense_provider.dart';
@@ -43,9 +44,23 @@ class SummarySection extends ConsumerWidget {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 const Text('Total Expense:'),
-                Text(
-                  '\$${totalSpent.toStringAsFixed(2)}',
-                  style: const TextStyle(fontWeight: FontWeight.bold),
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.end,
+                  children: [
+                    Text(
+                      MoneyFormatter.format(totalSpent, currencyCode: hangout.defaultCurrency),
+                      style: const TextStyle(fontWeight: FontWeight.bold),
+                    ),
+                    ...calculator.calculateTotalConverted(hangout).entries.map(
+                          (e) => Text(
+                            '(${MoneyFormatter.format(e.value, currencyCode: e.key)})',
+                            style: TextStyle(
+                              fontSize: 12,
+                              color: Theme.of(context).colorScheme.onSurfaceVariant,
+                            ),
+                          ),
+                        ),
+                  ],
                 ),
               ],
             ),

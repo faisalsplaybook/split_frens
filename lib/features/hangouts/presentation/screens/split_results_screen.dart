@@ -61,6 +61,8 @@ class SplitResultsScreen extends ConsumerWidget {
             totalExpenses: totalExpenses,
             netBalances: netBalances,
             allPeople: allPeople,
+            hangout: hangout,
+            calculator: calculator,
           ),
 
           const SizedBox(height: 32),
@@ -71,6 +73,7 @@ class SplitResultsScreen extends ConsumerWidget {
             allPeople: allPeople,
             allExpenses: allExpenses,
             totalSpent: totalSpent,
+            calculator: calculator,
           ),
 
           const SizedBox(height: 32),
