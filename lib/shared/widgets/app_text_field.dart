@@ -33,25 +33,34 @@ class AppTextField extends StatelessWidget {
     // TextFormField is the standard Flutter widget for forms because
     // it automatically connects to the surrounding Form widget for validation.
     return Padding(
-      // We add some bottom padding so multiple fields don't squish together
       padding: const EdgeInsets.only(bottom: 16.0),
-      child: TextFormField(
-        controller: controller,
-        validator: validator,
-        keyboardType: keyboardType,
-        maxLines: maxLines,
-        // The decoration determines how the field looks
-        decoration: InputDecoration(
-          labelText: label,
-          hintText: hint,
-          // We use an OutlineInputBorder to give it a modern box look
-          border: const OutlineInputBorder(),
-          // filled: true and fillColor gives it a subtle background color
-          filled: true,
-          fillColor: Colors.grey.shade50,
-          prefixIcon: prefixIcon != null ? Icon(prefixIcon) : null,
-          prefixText: prefixText,
-        ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          if (label.isNotEmpty) ...[
+            Text(
+              label,
+              style: const TextStyle(
+                fontSize: 14,
+                fontWeight: FontWeight.w500,
+                color: Color(0xFF94A3B8), // textSubtitle
+              ),
+            ),
+            const SizedBox(height: 8),
+          ],
+          TextFormField(
+            controller: controller,
+            validator: validator,
+            keyboardType: keyboardType,
+            maxLines: maxLines,
+            // The decoration determines how the field looks
+            decoration: InputDecoration(
+              hintText: hint,
+              prefixIcon: prefixIcon != null ? Icon(prefixIcon) : null,
+              prefixText: prefixText,
+            ),
+          ),
+        ],
       ),
     );
   }

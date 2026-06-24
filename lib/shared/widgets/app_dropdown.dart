@@ -25,19 +25,30 @@ class AppDropdown<T> extends StatelessWidget {
   Widget build(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 16.0),
-      // DropdownButtonFormField is like DropdownButton, but with built-in
-      // support for Form validation and InputDecoration styling!
-      child: DropdownButtonFormField<T>(
-        initialValue: value,
-        items: items,
-        onChanged: onChanged,
-        validator: validator,
-        decoration: InputDecoration(
-          labelText: label,
-          border: const OutlineInputBorder(),
-          filled: true,
-          fillColor: Colors.grey.shade50,
-        ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          if (label.isNotEmpty) ...[
+            Text(
+              label,
+              style: const TextStyle(
+                fontSize: 14,
+                fontWeight: FontWeight.w500,
+                color: Color(0xFF94A3B8), // textSubtitle
+              ),
+            ),
+            const SizedBox(height: 8),
+          ],
+          DropdownButtonFormField<T>(
+            initialValue: value,
+            items: items,
+            onChanged: onChanged,
+            validator: validator,
+            decoration: const InputDecoration(
+              // No labelText here, since it's displayed above
+            ),
+          ),
+        ],
       ),
     );
   }
