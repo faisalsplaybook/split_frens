@@ -162,7 +162,7 @@ class _AddExpensesScreenState extends ConsumerState<AddExpensesScreen> {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                const Icon(Icons.group_add, size: 64, color: Colors.grey),
+                const Icon(Icons.group_add, size: 64, color: Color(0xFF94A3B8)),
                 const SizedBox(height: 16),
                 const Text(
                   'Add at least 2 friends before adding expenses.',
@@ -300,7 +300,7 @@ class _AddExpensesScreenState extends ConsumerState<AddExpensesScreen> {
                                 children: [
                                   const Icon(
                                     Icons.error,
-                                    color: Colors.red,
+                                    color: Color(0xFFF59E0B),
                                     size: 16,
                                   ),
                                   const SizedBox(width: 4),
@@ -308,7 +308,7 @@ class _AddExpensesScreenState extends ConsumerState<AddExpensesScreen> {
                                     child: Text(
                                       state.errorMessage ?? 'API Error',
                                       style: const TextStyle(
-                                        color: Colors.red,
+                                        color: Color(0xFFF59E0B),
                                         fontSize: 12,
                                       ),
                                     ),

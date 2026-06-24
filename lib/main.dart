@@ -31,7 +31,9 @@ class MyApp extends ConsumerWidget {
       title: 'Split Frens',
 
       // Apply our custom theme here!
-      theme: AppTheme.lightTheme,
+      theme: AppTheme.darkTheme,
+      darkTheme: AppTheme.darkTheme,
+      themeMode: ThemeMode.dark,
 
       // Pass the router configuration to the app
       routerConfig: goRouter,

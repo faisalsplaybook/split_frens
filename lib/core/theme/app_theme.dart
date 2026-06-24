@@ -6,80 +6,95 @@ class AppTheme {
   /// We only use static methods here since we don't need to create an object of AppTheme.
   AppTheme._();
 
-  /// Returns the light theme configuration for the app.
-  static ThemeData get lightTheme {
+  /// Returns the dark theme configuration for the app.
+  static ThemeData get darkTheme {
+    const primaryTeal = Color(0xFF14B8A6);
+    const backgroundNavy = Color(0xFF0F172A);
+    const cardNavy = Color(0xFF1E293B);
+    const textWhite = Color(0xFFF8FAFC);
+    const textSubtitle = Color(0xFF94A3B8);
+
     return ThemeData(
-      // 1. Material 3 Enabled
-      // This tells Flutter to use the newer Material Design 3 guidelines
-      // which brings updated colors, typography, and widget shapes.
       useMaterial3: true,
-
-      // 2. Primary Color
-      // ColorScheme.fromSeed is a Material 3 feature that generates a harmonious
-      // color palette based on a single "seed" color. We'll use a shade of blue here.
-      colorScheme: ColorScheme.fromSeed(seedColor: Colors.blueAccent),
-
-      // 3. Scaffold Background
-      // The Scaffold is the base widget for most screens. This sets its default background color.
-      // We use a very light grey to make white cards stand out.
-      scaffoldBackgroundColor: const Color(
-        0xFFF8F9FA,
-      ), // A soft off-white/light grey
-      // 4. Card Theme
-      // This defines how all Card widgets will look globally unless overridden.
+      brightness: Brightness.dark,
+      scaffoldBackgroundColor: backgroundNavy,
+      colorScheme: const ColorScheme.dark(
+        primary: primaryTeal,
+        surface: backgroundNavy,
+        onSurface: textWhite,
+        error: Color(0xFFF59E0B), // Soft amber for warning/owes
+      ),
+      textTheme: const TextTheme(
+        bodyLarge: TextStyle(color: textWhite),
+        bodyMedium: TextStyle(color: textWhite),
+        titleLarge: TextStyle(color: textWhite),
+        titleMedium: TextStyle(color: textWhite),
+        titleSmall: TextStyle(color: textSubtitle),
+        labelLarge: TextStyle(color: textWhite),
+      ),
+      appBarTheme: const AppBarTheme(
+        backgroundColor: backgroundNavy,
+        foregroundColor: textWhite,
+        elevation: 0,
+        centerTitle: true,
+      ),
       cardTheme: CardThemeData(
-        color: Colors.white,
-        elevation:
-            2, // Gives the card a slight shadow to lift it off the background
+        color: cardNavy,
+        elevation: 2,
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(16), // Smooth rounded corners
+          borderRadius: BorderRadius.circular(16),
         ),
       ),
-
-      // 5. Button Theme
-      // We style ElevatedButton, which is the standard filled button in Material 3.
       elevatedButtonTheme: ElevatedButtonThemeData(
         style: ElevatedButton.styleFrom(
-          backgroundColor: Colors.blueAccent, // The button's background color
-          foregroundColor:
-              Colors.white, // The color of the text/icons inside the button
-          elevation: 0, // Flat look, common in modern designs
+          backgroundColor: primaryTeal,
+          foregroundColor: textWhite,
+          elevation: 0,
           padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(
-              12,
-            ), // Rounded corners for buttons
+            borderRadius: BorderRadius.circular(12),
           ),
           textStyle: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
         ),
       ),
-
-      // 6. Input Decoration Theme
-      // This styles TextFields and TextFormFields (for user input like text boxes).
+      outlinedButtonTheme: OutlinedButtonThemeData(
+        style: OutlinedButton.styleFrom(
+          foregroundColor: primaryTeal,
+          side: const BorderSide(color: primaryTeal),
+          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12),
+          ),
+          textStyle: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+        ),
+      ),
       inputDecorationTheme: InputDecorationTheme(
-        filled: true, // Fills the background of the input field
-        fillColor: Colors.white, // Background color of the input field
+        filled: true,
+        fillColor: cardNavy,
         contentPadding: const EdgeInsets.symmetric(
           horizontal: 20,
           vertical: 16,
         ),
-        // The border when the field is inactive
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
-          borderSide: BorderSide(color: Colors.grey.shade300),
+          borderSide: BorderSide.none,
         ),
-        // The border when the field is selected/focused
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
-          borderSide: const BorderSide(color: Colors.blueAccent, width: 2),
+          borderSide: const BorderSide(color: primaryTeal, width: 2),
         ),
-        // The border when the field is enabled but not focused
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
-          borderSide: BorderSide(color: Colors.grey.shade300),
+          borderSide: BorderSide.none,
         ),
-        // Hint text color
-        hintStyle: TextStyle(color: Colors.grey.shade500),
+        hintStyle: const TextStyle(color: textSubtitle),
+      ),
+      listTileTheme: const ListTileThemeData(
+        textColor: textWhite,
+        iconColor: primaryTeal,
+      ),
+      iconTheme: const IconThemeData(
+        color: primaryTeal,
       ),
     );
   }

@@ -230,7 +230,7 @@ class _AddPeopleScreenState extends ConsumerState<AddPeopleScreen> {
                                 ? Text(person.contactInfo!) 
                                 : null,
                             trailing: IconButton(
-                              icon: const Icon(Icons.remove_circle_outline, color: Colors.red),
+                              icon: const Icon(Icons.remove_circle_outline, color: Color(0xFFF59E0B)),
                               onPressed: () => _removePerson(person.id),
                             ),
                           ),

@@ -74,7 +74,7 @@ class ExpenseDetailScreen extends ConsumerWidget {
         title: const Text('Expense Details'),
         actions: [
           IconButton(
-            icon: const Icon(Icons.delete, color: Colors.red),
+            icon: const Icon(Icons.delete, color: Color(0xFFF59E0B)),
             onPressed: () {
               // MVP deletion (optional, not specifically requested but good UX)
               // Just a placeholder snackbar for now
@@ -117,13 +117,13 @@ class ExpenseDetailScreen extends ConsumerWidget {
                     const SizedBox(height: 8),
                     Text(
                       'Converted: ${MoneyFormatter.format(expense.convertedAmount!, currencyCode: expense.currency)}',
-                      style: const TextStyle(fontSize: 16, color: Colors.grey),
+                      style: const TextStyle(fontSize: 16, color: Color(0xFF5EEAD4)),
                     ),
                   ],
                   const SizedBox(height: 16),
                   Text(
                     'Added on ${DateFormatter.format(expense.date)}',
-                    style: const TextStyle(color: Colors.grey),
+                    style: const TextStyle(color: Color(0xFF94A3B8)),
                   ),
                 ],
               ),
@@ -142,7 +142,7 @@ class ExpenseDetailScreen extends ConsumerWidget {
                 children: [
                   const Text(
                     'Paid By',
-                    style: TextStyle(fontSize: 14, color: Colors.grey),
+                    style: TextStyle(fontSize: 14, color: Color(0xFF94A3B8)),
                   ),
                   const SizedBox(height: 4),
                   Row(
@@ -172,7 +172,7 @@ class ExpenseDetailScreen extends ConsumerWidget {
                     const SizedBox(height: 16),
                     const Text(
                       'Note',
-                      style: TextStyle(fontSize: 14, color: Colors.grey),
+                      style: TextStyle(fontSize: 14, color: Color(0xFF94A3B8)),
                     ),
                     const SizedBox(height: 4),
                     Text(expense.note!, style: const TextStyle(fontSize: 16)),
@@ -216,7 +216,7 @@ class ExpenseDetailScreen extends ConsumerWidget {
                           if (formattedConvertedShare != null)
                             Text(
                               '$formattedConvertedShare / person',
-                              style: const TextStyle(fontSize: 12, color: Colors.grey),
+                              style: const TextStyle(fontSize: 12, color: Color(0xFF5EEAD4)),
                             ),
                         ],
                       ),
@@ -257,7 +257,7 @@ class ExpenseDetailScreen extends ConsumerWidget {
                           if (formattedConvertedShare != null)
                             Text(
                               formattedConvertedShare,
-                              style: const TextStyle(fontSize: 12, color: Colors.grey),
+                              style: const TextStyle(fontSize: 12, color: Color(0xFF5EEAD4)),
                             ),
                         ],
                       ),

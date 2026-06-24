@@ -104,14 +104,14 @@ class SettlementsScreen extends ConsumerWidget {
                         Icon(
                           Icons.check_circle_outline,
                           size: 64,
-                          color: Colors.green.shade300,
+                          color: const Color(0xFF22C55E),
                         ),
                         const SizedBox(height: 16),
-                        Text(
+                        const Text(
                           'Everyone is settled.',
                           style: TextStyle(
                             fontSize: 20,
-                            color: Colors.grey.shade700,
+                            color: Color(0xFF94A3B8),
                           ),
                         ),
                       ],

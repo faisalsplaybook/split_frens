@@ -115,7 +115,7 @@ class _CurrencyConverterScreenState
               Center(
                 child: Text(
                   currencyState.errorMessage ?? 'Conversion failed',
-                  style: const TextStyle(color: Colors.red),
+                  style: const TextStyle(color: Color(0xFFF59E0B)),
                   textAlign: TextAlign.center,
                 ),
               )

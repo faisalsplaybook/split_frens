@@ -60,7 +60,7 @@ class SettlementPreviewSection extends StatelessWidget {
               child: Center(
                 child: Text(
                   'Everyone is settled up!',
-                  style: TextStyle(color: Colors.grey.shade600, fontSize: 16),
+                  style: TextStyle(color: Color(0xFF22C55E), fontSize: 16),
                 ),
               ),
             ),
@@ -104,13 +104,13 @@ class SettlementPreviewSection extends StatelessWidget {
                       style: const TextStyle(
                         fontWeight: FontWeight.bold,
                         fontSize: 16,
-                        color: Colors.redAccent,
+                        color: Color(0xFFF59E0B),
                       ),
                     ),
                     if (ratio > 0 && convertedTotals.isNotEmpty)
                        ...convertedTotals.entries.map((e) => Text(
                          MoneyFormatter.format(e.value * ratio, currencyCode: e.key),
-                         style: TextStyle(fontSize: 12, color: Colors.redAccent.withValues(alpha: 0.8)),
+                         style: const TextStyle(fontSize: 12, color: Color(0xFF5EEAD4)),
                        )),
                   ],
                 ),

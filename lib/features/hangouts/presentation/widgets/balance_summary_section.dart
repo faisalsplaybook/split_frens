@@ -45,43 +45,42 @@ class BalanceSummarySection extends StatelessWidget {
       children: [
         // Total Spent Card
         Card(
-          color: Theme.of(context).colorScheme.primaryContainer,
           child: Padding(
             padding: const EdgeInsets.all(24.0),
             child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
                 const Text(
                   'Total Spent',
-                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
+                  style: TextStyle(
+                    fontSize: 24,
+                    fontWeight: FontWeight.bold,
+                  ),
+                  textAlign: TextAlign.center,
                 ),
-                const SizedBox(height: 8),
+                const SizedBox(height: 16),
                 Text(
                   MoneyFormatter.format(totalSpent, currencyCode: hangout.defaultCurrency),
                   style: TextStyle(
-                    fontSize: 36,
+                    fontSize: 32,
                     fontWeight: FontWeight.bold,
-                    color: Theme.of(context).colorScheme.onPrimaryContainer,
+                    color: Theme.of(context).colorScheme.primary,
                   ),
+                  textAlign: TextAlign.center,
                 ),
                 if (convertedTotals.isNotEmpty) ...[
-                  const SizedBox(height: 4),
+                  const SizedBox(height: 8),
                   ...convertedTotals.entries.map((e) => Text(
-                    '(${MoneyFormatter.format(e.value, currencyCode: e.key)})',
-                    style: TextStyle(
-                      fontSize: 16,
-                      color: Theme.of(context).colorScheme.onPrimaryContainer.withValues(alpha: 0.8),
-                    ),
+                    'Converted: ${MoneyFormatter.format(e.value, currencyCode: e.key)}',
+                    style: const TextStyle(fontSize: 16, color: Color(0xFF5EEAD4)),
+                    textAlign: TextAlign.center,
                   )),
                 ],
-                const SizedBox(height: 8),
+                const SizedBox(height: 16),
                 Text(
                   '$totalExpenses Expenses',
-                  style: TextStyle(
-                    color: Theme.of(context)
-                        .colorScheme
-                        .onPrimaryContainer
-                        .withValues(alpha: 0.7),
-                  ),
+                  style: const TextStyle(color: Color(0xFF94A3B8)),
+                  textAlign: TextAlign.center,
                 ),
               ],
             ),
@@ -104,7 +103,7 @@ class BalanceSummarySection extends StatelessWidget {
             final name = _getPersonName(personId);
 
             final isPositive = balance >= 0;
-            final balanceColor = isPositive ? Colors.green : Colors.red;
+            final balanceColor = isPositive ? const Color(0xFF22C55E) : const Color(0xFFF59E0B);
             final balanceText = isPositive ? 'Gets back' : 'Owes';
 
             if (balance.abs() < 0.01) {
@@ -116,7 +115,7 @@ class BalanceSummarySection extends StatelessWidget {
                 ),
                 trailing: const Text(
                   'Settled Up',
-                  style: TextStyle(color: Colors.grey),
+                  style: TextStyle(color: Color(0xFF94A3B8)),
                 ),
               );
             }
@@ -126,7 +125,7 @@ class BalanceSummarySection extends StatelessWidget {
             return ListTile(
               leading: CircleAvatar(child: Text(name[0].toUpperCase())),
               title: Text(
-                name,
+                 name,
                 style: const TextStyle(fontWeight: FontWeight.bold),
               ),
               subtitle: Text(
@@ -151,7 +150,7 @@ class BalanceSummarySection extends StatelessWidget {
                   if (ratio > 0 && convertedTotals.isNotEmpty)
                      ...convertedTotals.entries.map((e) => Text(
                        MoneyFormatter.format(e.value * ratio, currencyCode: e.key),
-                       style: TextStyle(fontSize: 12, color: balanceColor.withValues(alpha: 0.8)),
+                       style: const TextStyle(fontSize: 12, color: Color(0xFF5EEAD4)),
                      )),
                 ],
               ),

@@ -54,9 +54,9 @@ class SummarySection extends ConsumerWidget {
                     ...calculator.calculateTotalConverted(hangout).entries.map(
                           (e) => Text(
                             '(${MoneyFormatter.format(e.value, currencyCode: e.key)})',
-                            style: TextStyle(
+                            style: const TextStyle(
                               fontSize: 12,
-                              color: Theme.of(context).colorScheme.onSurfaceVariant,
+                              color: Color(0xFF5EEAD4),
                             ),
                           ),
                         ),
@@ -87,7 +87,7 @@ class SummarySection extends ConsumerWidget {
                   unpaidCount == 0
                       ? Icons.check_circle
                       : Icons.warning_amber_rounded,
-                  color: unpaidCount == 0 ? Colors.green : Colors.red,
+                  color: unpaidCount == 0 ? const Color(0xFF22C55E) : const Color(0xFFF59E0B),
                   size: 20,
                 ),
                 const SizedBox(width: 8),
@@ -95,7 +95,7 @@ class SummarySection extends ConsumerWidget {
                   summaryStatusText,
                   style: TextStyle(
                     fontWeight: FontWeight.bold,
-                    color: unpaidCount == 0 ? Colors.green : Colors.red,
+                    color: unpaidCount == 0 ? const Color(0xFF22C55E) : const Color(0xFFF59E0B),
                   ),
                 ),
               ],
