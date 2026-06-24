@@ -1,5 +1,3 @@
-
-
 import '../models/expense_model.dart';
 import '../models/hangout_model.dart';
 import '../models/settlement_model.dart';
@@ -31,8 +29,11 @@ class SplitCalculatorService {
     final totals = <String, double>{};
     for (final expenseId in hangout.expenseIds) {
       final expense = _getExpense(expenseId);
-      if (expense != null && expense.convertedAmount != null && expense.currency != null) {
-        totals[expense.currency!] = (totals[expense.currency!] ?? 0.0) + expense.convertedAmount!;
+      if (expense != null &&
+          expense.convertedAmount != null &&
+          expense.currency != null) {
+        totals[expense.currency!] =
+            (totals[expense.currency!] ?? 0.0) + expense.convertedAmount!;
       }
     }
     return totals;

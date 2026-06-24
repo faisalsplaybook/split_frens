@@ -40,9 +40,11 @@ class _AddPeopleScreenState extends ConsumerState<AddPeopleScreen> {
       final contactInfo = _contactController.text.trim();
 
       // 1. Check if person already exists in THIS hangout
-      final hangout = ref.read(hangoutsProvider).firstWhere((h) => h.id == widget.hangoutId);
+      final hangout = ref
+          .read(hangoutsProvider)
+          .firstWhere((h) => h.id == widget.hangoutId);
       final allPeople = ref.read(personsProvider);
-      
+
       final isDuplicateInHangout = hangout.participantIds.any((id) {
         // Safety check in case a participant ID doesn't exist in allPeople
         try {
@@ -55,17 +57,25 @@ class _AddPeopleScreenState extends ConsumerState<AddPeopleScreen> {
 
       if (isDuplicateInHangout) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('A person with this name is already in this hangout!')),
+          const SnackBar(
+            content: Text(
+              'A person with this name is already in this hangout!',
+            ),
+          ),
         );
         return;
       }
 
       // 2. Check if the person exists globally but not in this hangout
-      final existingPerson = allPeople.where((p) => p.name.toLowerCase() == name.toLowerCase()).firstOrNull;
+      final existingPerson = allPeople
+          .where((p) => p.name.toLowerCase() == name.toLowerCase())
+          .firstOrNull;
 
       if (existingPerson != null) {
         // Reuse the existing person
-        ref.read(hangoutsProvider.notifier).addPerson(widget.hangoutId, existingPerson.id);
+        ref
+            .read(hangoutsProvider.notifier)
+            .addPerson(widget.hangoutId, existingPerson.id);
       } else {
         // 3. Create the new person globally
         final newPerson = PersonModel(
@@ -75,29 +85,35 @@ class _AddPeopleScreenState extends ConsumerState<AddPeopleScreen> {
         );
 
         ref.read(personsProvider.notifier).addPerson(newPerson);
-        
+
         // 4. Add new person to this specific hangout
-        ref.read(hangoutsProvider.notifier).addPerson(widget.hangoutId, newPerson.id);
+        ref
+            .read(hangoutsProvider.notifier)
+            .addPerson(widget.hangoutId, newPerson.id);
       }
 
       // 4. Clear the form
       _nameController.clear();
       _contactController.clear();
 
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Person added!')),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('Person added!')));
     }
   }
 
   void _removePerson(String personId) {
     // 1. Check if the person is part of any expense in this hangout
-    final hangout = ref.read(hangoutsProvider).firstWhere((h) => h.id == widget.hangoutId);
+    final hangout = ref
+        .read(hangoutsProvider)
+        .firstWhere((h) => h.id == widget.hangoutId);
     final allExpenses = ref.read(expensesProvider);
-    
+
     // Get only the expenses that belong to this hangout
-    final hangoutExpenses = allExpenses.where((e) => hangout.expenseIds.contains(e.id)).toList();
-    
+    final hangoutExpenses = allExpenses
+        .where((e) => hangout.expenseIds.contains(e.id))
+        .toList();
+
     // Check if the person is involved in any of these expenses
     final isInvolved = hangoutExpenses.any(
       (e) => e.paidById == personId || e.participantIds.contains(personId),
@@ -105,12 +121,16 @@ class _AddPeopleScreenState extends ConsumerState<AddPeopleScreen> {
 
     if (isInvolved) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('This person is already part of an expense.')),
+        const SnackBar(
+          content: Text('This person is already part of an expense.'),
+        ),
       );
       return;
     }
 
-    ref.read(hangoutsProvider.notifier).removePerson(widget.hangoutId, personId);
+    ref
+        .read(hangoutsProvider.notifier)
+        .removePerson(widget.hangoutId, personId);
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(content: Text('Person removed from hangout')),
     );
@@ -119,20 +139,20 @@ class _AddPeopleScreenState extends ConsumerState<AddPeopleScreen> {
   @override
   Widget build(BuildContext context) {
     // 1. Watch the current hangout to get its participant IDs
-    final hangout = ref.watch(hangoutsProvider).firstWhere((h) => h.id == widget.hangoutId);
-    
+    final hangout = ref
+        .watch(hangoutsProvider)
+        .firstWhere((h) => h.id == widget.hangoutId);
+
     // 2. Watch all people to find the actual PersonModel for each ID
     final allPeople = ref.watch(personsProvider);
-    
+
     // 3. Get the full models for the participants in this hangout
     final participants = hangout.participantIds
         .map((id) => allPeople.firstWhere((p) => p.id == id))
         .toList();
 
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Add People'),
-      ),
+      appBar: AppBar(title: const Text('Add People')),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
@@ -151,19 +171,23 @@ class _AddPeopleScreenState extends ConsumerState<AddPeopleScreen> {
                     children: [
                       const Text(
                         'Add a Friend',
-                        style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                        style: TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                        ),
                       ),
                       const SizedBox(height: 16),
-                      
+
                       AppTextField(
                         controller: _nameController,
                         label: 'Name',
                         hint: 'e.g. John Doe',
                         prefixIcon: Icons.person,
-                        validator: (value) => AppValidators.validateRequiredText(value, 'Name'),
+                        validator: (value) =>
+                            AppValidators.validateRequiredText(value, 'Name'),
                       ),
                       const SizedBox(height: 16),
-                      
+
                       AppTextField(
                         controller: _contactController,
                         label: 'Contact Info (Optional)',
@@ -171,7 +195,7 @@ class _AddPeopleScreenState extends ConsumerState<AddPeopleScreen> {
                         prefixIcon: Icons.contact_mail,
                       ),
                       const SizedBox(height: 16),
-                      
+
                       ElevatedButton.icon(
                         onPressed: _addPerson,
                         icon: const Icon(Icons.add),
@@ -208,29 +232,36 @@ class _AddPeopleScreenState extends ConsumerState<AddPeopleScreen> {
                       itemBuilder: (context, index) {
                         final person = participants[index];
                         // Auto-generate initials for the avatar
-                        final initials = person.name.isNotEmpty 
-                            ? person.name.substring(0, 1).toUpperCase() 
+                        final initials = person.name.isNotEmpty
+                            ? person.name.substring(0, 1).toUpperCase()
                             : '?';
 
                         return Card(
                           margin: const EdgeInsets.only(bottom: 8.0),
                           child: ListTile(
                             leading: CircleAvatar(
-                              backgroundColor: Theme.of(context).colorScheme.primaryContainer,
+                              backgroundColor: Theme.of(
+                                context,
+                              ).colorScheme.primaryContainer,
                               child: Text(
                                 initials,
                                 style: TextStyle(
-                                  color: Theme.of(context).colorScheme.onPrimaryContainer,
+                                  color: Theme.of(
+                                    context,
+                                  ).colorScheme.onPrimaryContainer,
                                   fontWeight: FontWeight.bold,
                                 ),
                               ),
                             ),
                             title: Text(person.name),
-                            subtitle: person.contactInfo != null 
-                                ? Text(person.contactInfo!) 
+                            subtitle: person.contactInfo != null
+                                ? Text(person.contactInfo!)
                                 : null,
                             trailing: IconButton(
-                              icon: const Icon(Icons.remove_circle_outline, color: Color(0xFFF59E0B)),
+                              icon: const Icon(
+                                Icons.remove_circle_outline,
+                                color: Color(0xFFF59E0B),
+                              ),
                               onPressed: () => _removePerson(person.id),
                             ),
                           ),

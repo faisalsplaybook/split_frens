@@ -52,15 +52,15 @@ class BalanceSummarySection extends StatelessWidget {
               children: [
                 const Text(
                   'Total Spent',
-                  style: TextStyle(
-                    fontSize: 24,
-                    fontWeight: FontWeight.bold,
-                  ),
+                  style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
                   textAlign: TextAlign.center,
                 ),
                 const SizedBox(height: 16),
                 Text(
-                  MoneyFormatter.format(totalSpent, currencyCode: hangout.defaultCurrency),
+                  MoneyFormatter.format(
+                    totalSpent,
+                    currencyCode: hangout.defaultCurrency,
+                  ),
                   style: TextStyle(
                     fontSize: 32,
                     fontWeight: FontWeight.bold,
@@ -70,11 +70,16 @@ class BalanceSummarySection extends StatelessWidget {
                 ),
                 if (convertedTotals.isNotEmpty) ...[
                   const SizedBox(height: 8),
-                  ...convertedTotals.entries.map((e) => Text(
-                    'Converted: ${MoneyFormatter.format(e.value, currencyCode: e.key)}',
-                    style: const TextStyle(fontSize: 16, color: Color(0xFF5EEAD4)),
-                    textAlign: TextAlign.center,
-                  )),
+                  ...convertedTotals.entries.map(
+                    (e) => Text(
+                      'Converted: ${MoneyFormatter.format(e.value, currencyCode: e.key)}',
+                      style: const TextStyle(
+                        fontSize: 16,
+                        color: Color(0xFF5EEAD4),
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
+                  ),
                 ],
                 const SizedBox(height: 16),
                 Text(
@@ -103,7 +108,9 @@ class BalanceSummarySection extends StatelessWidget {
             final name = _getPersonName(personId);
 
             final isPositive = balance >= 0;
-            final balanceColor = isPositive ? const Color(0xFF22C55E) : const Color(0xFFF59E0B);
+            final balanceColor = isPositive
+                ? const Color(0xFF22C55E)
+                : const Color(0xFFF59E0B);
             final balanceText = isPositive ? 'Gets back' : 'Owes';
 
             if (balance.abs() < 0.01) {
@@ -125,7 +132,7 @@ class BalanceSummarySection extends StatelessWidget {
             return ListTile(
               leading: CircleAvatar(child: Text(name[0].toUpperCase())),
               title: Text(
-                 name,
+                name,
                 style: const TextStyle(fontWeight: FontWeight.bold),
               ),
               subtitle: Text(
@@ -140,7 +147,10 @@ class BalanceSummarySection extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.end,
                 children: [
                   Text(
-                    MoneyFormatter.format(balance.abs(), currencyCode: hangout.defaultCurrency),
+                    MoneyFormatter.format(
+                      balance.abs(),
+                      currencyCode: hangout.defaultCurrency,
+                    ),
                     style: TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.bold,
@@ -148,10 +158,18 @@ class BalanceSummarySection extends StatelessWidget {
                     ),
                   ),
                   if (ratio > 0 && convertedTotals.isNotEmpty)
-                     ...convertedTotals.entries.map((e) => Text(
-                       MoneyFormatter.format(e.value * ratio, currencyCode: e.key),
-                       style: const TextStyle(fontSize: 12, color: Color(0xFF5EEAD4)),
-                     )),
+                    ...convertedTotals.entries.map(
+                      (e) => Text(
+                        MoneyFormatter.format(
+                          e.value * ratio,
+                          currencyCode: e.key,
+                        ),
+                        style: const TextStyle(
+                          fontSize: 12,
+                          color: Color(0xFF5EEAD4),
+                        ),
+                      ),
+                    ),
                 ],
               ),
             );

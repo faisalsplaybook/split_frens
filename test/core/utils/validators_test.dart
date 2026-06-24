@@ -16,21 +16,33 @@ void main() {
       expect(AppValidators.validateCurrency(null, true), isNotNull);
       expect(AppValidators.validateCurrency('', true), isNotNull);
       expect(AppValidators.validateCurrency('USD', true), isNull);
-      
+
       // Travel mode OFF
       expect(AppValidators.validateCurrency(null, false), isNull);
     });
 
     test('Empty person name', () {
       expect(AppValidators.validateRequiredText('', 'Person name'), isNotNull);
-      expect(AppValidators.validateRequiredText(null, 'Person name'), isNotNull);
-      expect(AppValidators.validateRequiredText('Alice', 'Person name'), isNull);
+      expect(
+        AppValidators.validateRequiredText(null, 'Person name'),
+        isNotNull,
+      );
+      expect(
+        AppValidators.validateRequiredText('Alice', 'Person name'),
+        isNull,
+      );
     });
 
     test('Duplicate person name', () {
       final existingNames = ['Alice', 'Bob'];
-      expect(AppValidators.validateDuplicateName('Alice', existingNames), isNotNull);
-      expect(AppValidators.validateDuplicateName('Charlie', existingNames), isNull);
+      expect(
+        AppValidators.validateDuplicateName('Alice', existingNames),
+        isNotNull,
+      );
+      expect(
+        AppValidators.validateDuplicateName('Charlie', existingNames),
+        isNull,
+      );
     });
 
     test('Invalid amount', () {

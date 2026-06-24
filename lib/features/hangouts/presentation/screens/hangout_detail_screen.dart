@@ -43,7 +43,11 @@ class HangoutDetailScreen extends ConsumerWidget {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              const Icon(Icons.error_outline, size: 64, color: Color(0xFFF59E0B)),
+              const Icon(
+                Icons.error_outline,
+                size: 64,
+                color: Color(0xFFF59E0B),
+              ),
               const SizedBox(height: 16),
               const Text(
                 'Hangout not found.',

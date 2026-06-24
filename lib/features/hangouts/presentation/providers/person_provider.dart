@@ -24,11 +24,11 @@ class PersonsNotifier extends Notifier<List<PersonModel>> {
     final isDuplicate = state.any(
       (p) => p.name.toLowerCase() == person.name.toLowerCase(),
     );
-    
+
     if (isDuplicate) {
       throw Exception('A person with this name already exists.');
     }
-    
+
     state = [...state, person];
     _save();
   }
@@ -60,6 +60,8 @@ class PersonsNotifier extends Notifier<List<PersonModel>> {
   }
 }
 
-final personsProvider = NotifierProvider<PersonsNotifier, List<PersonModel>>(() {
-  return PersonsNotifier();
-});
+final personsProvider = NotifierProvider<PersonsNotifier, List<PersonModel>>(
+  () {
+    return PersonsNotifier();
+  },
+);

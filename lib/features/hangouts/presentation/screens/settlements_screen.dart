@@ -131,8 +131,7 @@ class SettlementsScreen extends ConsumerWidget {
                         calculator: calculator,
                         totalSpent: calculator.calculateTotalSpent(hangout),
                         onTogglePaid: () {
-                          final notifier =
-                              ref.read(hangoutsProvider.notifier);
+                          final notifier = ref.read(hangoutsProvider.notifier);
                           if (isPaid) {
                             notifier.markSettlementUnpaid(
                               hangoutId,

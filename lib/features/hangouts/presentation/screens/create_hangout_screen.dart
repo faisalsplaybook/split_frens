@@ -20,7 +20,8 @@ class CreateHangoutScreen extends ConsumerStatefulWidget {
   const CreateHangoutScreen({super.key});
 
   @override
-  ConsumerState<CreateHangoutScreen> createState() => _CreateHangoutScreenState();
+  ConsumerState<CreateHangoutScreen> createState() =>
+      _CreateHangoutScreenState();
 }
 
 class _CreateHangoutScreenState extends ConsumerState<CreateHangoutScreen> {
@@ -68,7 +69,7 @@ class _CreateHangoutScreenState extends ConsumerState<CreateHangoutScreen> {
       );
 
       // 3. Add it to our central state (Riverpod) instead of the local DummyData list!
-      // We use ref.read instead of ref.watch because we are inside a button press (an event), 
+      // We use ref.read instead of ref.watch because we are inside a button press (an event),
       // not inside the build() method.
       ref.read(hangoutsProvider.notifier).createHangout(newHangout);
 
@@ -141,7 +142,6 @@ class _CreateHangoutScreenState extends ConsumerState<CreateHangoutScreen> {
 
               // Removed Travel Mode toggle and conditional Base Currency dropdown
               // because currency conversion is handled per-expense in AddExpensesScreen.
-
               const SizedBox(height: 32),
 
               // ==========================================

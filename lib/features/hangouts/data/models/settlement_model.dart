@@ -37,15 +37,16 @@ class SettlementModel {
   }
 
   Map<String, dynamic> toJson() => {
-        'id': id,
-        'payerId': payerId,
-        'payeeId': payeeId,
-        'amount': amount,
-        'date': date.toIso8601String(),
-        'isPaid': isPaid,
-      };
+    'id': id,
+    'payerId': payerId,
+    'payeeId': payeeId,
+    'amount': amount,
+    'date': date.toIso8601String(),
+    'isPaid': isPaid,
+  };
 
-  factory SettlementModel.fromJson(Map<String, dynamic> json) => SettlementModel(
+  factory SettlementModel.fromJson(Map<String, dynamic> json) =>
+      SettlementModel(
         id: json['id'] as String,
         payerId: json['payerId'] as String,
         payeeId: json['payeeId'] as String,

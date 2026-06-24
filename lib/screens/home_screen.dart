@@ -41,7 +41,11 @@ class HomeScreen extends ConsumerWidget {
             Expanded(
               child: hangouts.isEmpty
                   ? _buildEmptyState(context)
-                  : _buildRecentHangouts(context, recentHangouts, hangouts.length),
+                  : _buildRecentHangouts(
+                      context,
+                      recentHangouts,
+                      hangouts.length,
+                    ),
             ),
 
             // ==========================================

@@ -47,7 +47,6 @@ final appRouterProvider = Provider<GoRouter>((ref) {
         builder: (context, state) => const CreateHangoutScreen(),
       ),
 
-
       GoRoute(
         path: '/settings',
         builder: (context, state) => const SettingsScreen(),

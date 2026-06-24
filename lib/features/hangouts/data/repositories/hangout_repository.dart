@@ -26,7 +26,8 @@ class HangoutRepository {
     );
   }
 
-  Future<void> deleteHangout(String id, {
+  Future<void> deleteHangout(
+    String id, {
     required List<HangoutModel> currentHangouts,
     required List<PersonModel> currentPersons,
     required List<ExpenseModel> currentExpenses,

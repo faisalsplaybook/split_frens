@@ -48,10 +48,16 @@ class SummarySection extends ConsumerWidget {
                   crossAxisAlignment: CrossAxisAlignment.end,
                   children: [
                     Text(
-                      MoneyFormatter.format(totalSpent, currencyCode: hangout.defaultCurrency),
+                      MoneyFormatter.format(
+                        totalSpent,
+                        currencyCode: hangout.defaultCurrency,
+                      ),
                       style: const TextStyle(fontWeight: FontWeight.bold),
                     ),
-                    ...calculator.calculateTotalConverted(hangout).entries.map(
+                    ...calculator
+                        .calculateTotalConverted(hangout)
+                        .entries
+                        .map(
                           (e) => Text(
                             '(${MoneyFormatter.format(e.value, currencyCode: e.key)})',
                             style: const TextStyle(
@@ -87,7 +93,9 @@ class SummarySection extends ConsumerWidget {
                   unpaidCount == 0
                       ? Icons.check_circle
                       : Icons.warning_amber_rounded,
-                  color: unpaidCount == 0 ? const Color(0xFF22C55E) : const Color(0xFFF59E0B),
+                  color: unpaidCount == 0
+                      ? const Color(0xFF22C55E)
+                      : const Color(0xFFF59E0B),
                   size: 20,
                 ),
                 const SizedBox(width: 8),
@@ -95,7 +103,9 @@ class SummarySection extends ConsumerWidget {
                   summaryStatusText,
                   style: TextStyle(
                     fontWeight: FontWeight.bold,
-                    color: unpaidCount == 0 ? const Color(0xFF22C55E) : const Color(0xFFF59E0B),
+                    color: unpaidCount == 0
+                        ? const Color(0xFF22C55E)
+                        : const Color(0xFFF59E0B),
                   ),
                 ),
               ],

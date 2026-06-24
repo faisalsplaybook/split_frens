@@ -6,12 +6,9 @@ import 'core/theme/app_theme.dart';
 // 2. Import our newly created router
 import 'core/router/app_router.dart';
 
-
 void main() {
   runApp(const ProviderScope(child: MyApp()));
 }
-
-
 
 // 3. We change StatelessWidget to ConsumerWidget.
 // A ConsumerWidget is a Riverpod widget that can "listen" to providers.

@@ -79,9 +79,9 @@ class SettlementPreviewSection extends StatelessWidget {
                 ),
                 title: RichText(
                   text: TextSpan(
-                    style: DefaultTextStyle.of(context)
-                        .style
-                        .copyWith(fontSize: 16),
+                    style: DefaultTextStyle.of(
+                      context,
+                    ).style.copyWith(fontSize: 16),
                     children: [
                       TextSpan(
                         text: debtorName,
@@ -100,7 +100,10 @@ class SettlementPreviewSection extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.end,
                   children: [
                     Text(
-                      MoneyFormatter.format(settlement.amount, currencyCode: hangout.defaultCurrency),
+                      MoneyFormatter.format(
+                        settlement.amount,
+                        currencyCode: hangout.defaultCurrency,
+                      ),
                       style: const TextStyle(
                         fontWeight: FontWeight.bold,
                         fontSize: 16,
@@ -108,10 +111,18 @@ class SettlementPreviewSection extends StatelessWidget {
                       ),
                     ),
                     if (ratio > 0 && convertedTotals.isNotEmpty)
-                       ...convertedTotals.entries.map((e) => Text(
-                         MoneyFormatter.format(e.value * ratio, currencyCode: e.key),
-                         style: const TextStyle(fontSize: 12, color: Color(0xFF5EEAD4)),
-                       )),
+                      ...convertedTotals.entries.map(
+                        (e) => Text(
+                          MoneyFormatter.format(
+                            e.value * ratio,
+                            currencyCode: e.key,
+                          ),
+                          style: const TextStyle(
+                            fontSize: 12,
+                            color: Color(0xFF5EEAD4),
+                          ),
+                        ),
+                      ),
                   ],
                 ),
               ),

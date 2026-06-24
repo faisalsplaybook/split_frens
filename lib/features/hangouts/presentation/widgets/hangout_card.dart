@@ -20,7 +20,10 @@ class HangoutCard extends ConsumerWidget {
     final totalAmount = calculator.calculateTotalSpent(hangout);
 
     final String dateStr = DateFormatter.format(hangout.startDate);
-    final String totalAmountStr = MoneyFormatter.format(totalAmount, currencyCode: hangout.defaultCurrency);
+    final String totalAmountStr = MoneyFormatter.format(
+      totalAmount,
+      currencyCode: hangout.defaultCurrency,
+    );
 
     // Determine settlement status based on the hangout's paidSettlementIds
     // We can't run the full settlement calc here without a circular dependency,

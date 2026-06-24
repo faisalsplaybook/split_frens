@@ -22,8 +22,9 @@ class ExpenseSection extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final allExpenses = ref.watch(expensesProvider);
     final allPeople = ref.watch(personsProvider);
-    final hangoutExpenses =
-        allExpenses.where((e) => hangout.expenseIds.contains(e.id)).toList();
+    final hangoutExpenses = allExpenses
+        .where((e) => hangout.expenseIds.contains(e.id))
+        .toList();
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -56,14 +57,16 @@ class ExpenseSection extends ConsumerWidget {
               // Get Payer Name safely
               final payer = allPeople.firstWhere(
                 (p) => p.id == expense.paidById,
-                orElse: () => PersonModel(id: expense.paidById, name: 'Unknown'),
+                orElse: () =>
+                    PersonModel(id: expense.paidById, name: 'Unknown'),
               );
 
               return Card(
                 child: ListTile(
                   leading: CircleAvatar(
-                    backgroundColor:
-                        Theme.of(context).colorScheme.secondaryContainer,
+                    backgroundColor: Theme.of(
+                      context,
+                    ).colorScheme.secondaryContainer,
                     child: const Icon(Icons.receipt),
                   ),
                   title: Text(expense.title),
@@ -71,7 +74,10 @@ class ExpenseSection extends ConsumerWidget {
                     'Paid by ${payer.name} • ${expense.participantIds.length} participants',
                   ),
                   trailing: Text(
-                    MoneyFormatter.format(expense.amount, currencyCode: hangout.defaultCurrency),
+                    MoneyFormatter.format(
+                      expense.amount,
+                      currencyCode: hangout.defaultCurrency,
+                    ),
                     style: const TextStyle(
                       fontWeight: FontWeight.bold,
                       fontSize: 16,

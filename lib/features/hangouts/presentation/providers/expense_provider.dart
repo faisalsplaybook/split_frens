@@ -51,6 +51,8 @@ class ExpensesNotifier extends Notifier<List<ExpenseModel>> {
   }
 }
 
-final expensesProvider = NotifierProvider<ExpensesNotifier, List<ExpenseModel>>(() {
-  return ExpensesNotifier();
-});
+final expensesProvider = NotifierProvider<ExpensesNotifier, List<ExpenseModel>>(
+  () {
+    return ExpensesNotifier();
+  },
+);

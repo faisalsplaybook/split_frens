@@ -18,58 +18,73 @@ class SummaryGenerator {
     final convertedTotals = calculator.calculateTotalConverted(hangout);
 
     String formatBase(double amt) {
-       return MoneyFormatter.format(amt, currencyCode: hangout.defaultCurrency);
+      return MoneyFormatter.format(amt, currencyCode: hangout.defaultCurrency);
     }
-    
+
     String getConvertedSuffix(double baseAmount) {
-       if (totalExpense <= 0 || convertedTotals.isEmpty) return '';
-       final ratio = baseAmount / totalExpense;
-       final parts = convertedTotals.entries.map((e) => MoneyFormatter.format(e.value * ratio, currencyCode: e.key));
-       return ' (${parts.join(', ')})';
+      if (totalExpense <= 0 || convertedTotals.isEmpty) return '';
+      final ratio = baseAmount / totalExpense;
+      final parts = convertedTotals.entries.map(
+        (e) => MoneyFormatter.format(e.value * ratio, currencyCode: e.key),
+      );
+      return ' (${parts.join(', ')})';
     }
 
     // Header
     buffer.writeln('SplitFrens Summary');
     buffer.writeln(hangout.title);
     buffer.writeln();
-    
+
     // Total and People
-    buffer.writeln('Total: ${formatBase(totalExpense)}${getConvertedSuffix(totalExpense)}');
+    buffer.writeln(
+      'Total: ${formatBase(totalExpense)}${getConvertedSuffix(totalExpense)}',
+    );
     final peopleNames = people.map((p) => p.name).join(', ');
     buffer.writeln('People: $peopleNames');
     buffer.writeln();
-    
+
     // Expenses
     buffer.writeln('Expenses:');
     for (final expense in expenses) {
-      final payer = people.firstWhere(
-        (p) => p.id == expense.paidById, 
-        orElse: () => PersonModel(id: '', name: 'Unknown')
-      ).name;
+      final payer = people
+          .firstWhere(
+            (p) => p.id == expense.paidById,
+            orElse: () => PersonModel(id: '', name: 'Unknown'),
+          )
+          .name;
 
       String expSuffix = '';
       if (expense.convertedAmount != null && expense.currency != null) {
-         expSuffix = ' (${MoneyFormatter.format(expense.convertedAmount!, currencyCode: expense.currency!)})';
+        expSuffix =
+            ' (${MoneyFormatter.format(expense.convertedAmount!, currencyCode: expense.currency!)})';
       }
-      buffer.writeln('- ${expense.title}: ${formatBase(expense.amount)}$expSuffix paid by $payer');
+      buffer.writeln(
+        '- ${expense.title}: ${formatBase(expense.amount)}$expSuffix paid by $payer',
+      );
     }
     buffer.writeln();
-    
+
     // Settlements
     buffer.writeln('Settlements:');
     for (final s in settlements) {
-      final from = people.firstWhere(
-        (p) => p.id == s.payerId, 
-        orElse: () => PersonModel(id: '', name: 'Unknown')
-      ).name;
-      final to = people.firstWhere(
-        (p) => p.id == s.payeeId, 
-        orElse: () => PersonModel(id: '', name: 'Unknown')
-      ).name;
+      final from = people
+          .firstWhere(
+            (p) => p.id == s.payerId,
+            orElse: () => PersonModel(id: '', name: 'Unknown'),
+          )
+          .name;
+      final to = people
+          .firstWhere(
+            (p) => p.id == s.payeeId,
+            orElse: () => PersonModel(id: '', name: 'Unknown'),
+          )
+          .name;
       final status = s.isPaid ? 'Paid' : 'Unpaid';
-      buffer.writeln('- $from pays $to ${formatBase(s.amount)}${getConvertedSuffix(s.amount)} - $status');
+      buffer.writeln(
+        '- $from pays $to ${formatBase(s.amount)}${getConvertedSuffix(s.amount)} - $status',
+      );
     }
-    
+
     return buffer.toString().trim();
   }
 }

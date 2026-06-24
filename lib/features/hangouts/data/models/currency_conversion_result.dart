@@ -31,11 +31,11 @@ class CurrencyConversionResult {
   }
 
   Map<String, dynamic> toJson() => {
-        'fromCurrency': fromCurrency,
-        'toCurrency': toCurrency,
-        'rate': rate,
-        'lastUpdated': lastUpdated.toIso8601String(),
-      };
+    'fromCurrency': fromCurrency,
+    'toCurrency': toCurrency,
+    'rate': rate,
+    'lastUpdated': lastUpdated.toIso8601String(),
+  };
 
   factory CurrencyConversionResult.fromJson(Map<String, dynamic> json) =>
       CurrencyConversionResult(

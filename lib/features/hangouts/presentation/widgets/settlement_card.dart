@@ -46,7 +46,9 @@ class SettlementCard extends StatelessWidget {
     final isPaid = settlement.isPaid;
     final cardColor = const Color(0xFF1E293B);
     final textColor = const Color(0xFFF8FAFC);
-    final iconColor = isPaid ? const Color(0xFF22C55E) : const Color(0xFFF59E0B);
+    final iconColor = isPaid
+        ? const Color(0xFF22C55E)
+        : const Color(0xFFF59E0B);
     final iconData = isPaid ? Icons.check_circle : Icons.warning_amber_rounded;
 
     final convertedTotals = calculator.calculateTotalConverted(hangout);
@@ -76,7 +78,10 @@ class SettlementCard extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.end,
                   children: [
                     Text(
-                      MoneyFormatter.format(settlement.amount, currencyCode: hangout.defaultCurrency),
+                      MoneyFormatter.format(
+                        settlement.amount,
+                        currencyCode: hangout.defaultCurrency,
+                      ),
                       style: TextStyle(
                         fontSize: 24,
                         fontWeight: FontWeight.bold,
@@ -84,13 +89,18 @@ class SettlementCard extends StatelessWidget {
                       ),
                     ),
                     if (ratio > 0 && convertedTotals.isNotEmpty)
-                      ...convertedTotals.entries.map((e) => Text(
-                        MoneyFormatter.format(e.value * ratio, currencyCode: e.key),
-                        style: const TextStyle(
-                          fontSize: 14,
-                          color: Color(0xFF5EEAD4),
+                      ...convertedTotals.entries.map(
+                        (e) => Text(
+                          MoneyFormatter.format(
+                            e.value * ratio,
+                            currencyCode: e.key,
+                          ),
+                          style: const TextStyle(
+                            fontSize: 14,
+                            color: Color(0xFF5EEAD4),
+                          ),
                         ),
-                      )),
+                      ),
                   ],
                 ),
               ],
@@ -98,9 +108,9 @@ class SettlementCard extends StatelessWidget {
             const SizedBox(height: 16),
             RichText(
               text: TextSpan(
-                style: DefaultTextStyle.of(context)
-                    .style
-                    .copyWith(fontSize: 18, color: textColor),
+                style: DefaultTextStyle.of(
+                  context,
+                ).style.copyWith(fontSize: 18, color: textColor),
                 children: [
                   TextSpan(
                     text: debtorName,
@@ -121,9 +131,7 @@ class SettlementCard extends StatelessWidget {
                 onPressed: onTogglePaid,
                 style: OutlinedButton.styleFrom(
                   foregroundColor: textColor,
-                  side: BorderSide(
-                    color: textColor.withValues(alpha: 0.5),
-                  ),
+                  side: BorderSide(color: textColor.withValues(alpha: 0.5)),
                 ),
                 child: Text(isPaid ? 'Mark as Unpaid' : 'Mark as Paid'),
               ),

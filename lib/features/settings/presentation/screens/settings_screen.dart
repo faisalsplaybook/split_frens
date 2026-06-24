@@ -86,7 +86,9 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
       builder: (context) {
         return AlertDialog(
           title: const Text('Delete all data?'),
-          content: const Text('Are you sure? This will delete all saved hangouts.'),
+          content: const Text(
+            'Are you sure? This will delete all saved hangouts.',
+          ),
           actions: [
             TextButton(
               onPressed: () => Navigator.pop(context),
@@ -103,9 +105,9 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
 
                 // 2. Clear all providers in memory (which will auto-save empty lists)
                 ref.read(hangoutsProvider.notifier).clearAllHangouts();
-                
-                // We don't explicitly have clearAll on persons/expenses yet, 
-                // but wiping hangouts is the core structure. 
+
+                // We don't explicitly have clearAll on persons/expenses yet,
+                // but wiping hangouts is the core structure.
                 // To be completely clean, let's force a reload.
                 // In Riverpod, we can invalidate to force them to re-run their build().
                 ref.invalidate(hangoutsProvider);
@@ -130,9 +132,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Settings'),
-      ),
+      appBar: AppBar(title: const Text('Settings')),
       body: ListView(
         children: [
           ListTile(

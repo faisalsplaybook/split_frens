@@ -58,7 +58,10 @@ class AppValidators {
   }
 
   // 5. Duplicate person name
-  static String? validateDuplicateName(String? value, List<String> existingNames) {
+  static String? validateDuplicateName(
+    String? value,
+    List<String> existingNames,
+  ) {
     final requiredError = validateRequiredText(value, 'Person name');
     if (requiredError != null) return requiredError;
 

@@ -7,6 +7,8 @@ import '../../../../core/utils/validators.dart';
 import '../../../../shared/widgets/app_text_field.dart';
 import '../../data/models/expense_model.dart';
 import '../../data/models/split_type.dart';
+import '../../data/models/hangout_model.dart';
+import '../../data/models/person_model.dart';
 import '../providers/hangout_provider.dart';
 import '../providers/person_provider.dart';
 import '../providers/expense_provider.dart';
@@ -119,8 +121,11 @@ class _AddExpensesScreenState extends ConsumerState<AddExpensesScreen> {
       return;
     }
 
-    final hangout = ref.read(hangoutsProvider).firstWhere((h) => h.id == widget.hangoutId);
-    final fromCurr = hangout.defaultCurrency ?? CurrencyConstants.supportedCurrencies.first;
+    final hangout = ref
+        .read(hangoutsProvider)
+        .firstWhere((h) => h.id == widget.hangoutId);
+    final fromCurr =
+        hangout.defaultCurrency ?? CurrencyConstants.supportedCurrencies.first;
 
     await ref
         .read(currencyProvider.notifier)
@@ -195,265 +200,13 @@ class _AddExpensesScreenState extends ConsumerState<AddExpensesScreen> {
         child: ListView(
           padding: const EdgeInsets.all(16.0),
           children: [
-            // 1. Title & Amount
-            Card(
-              child: Padding(
-                padding: const EdgeInsets.all(16.0),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
-                    AppTextField(
-                      controller: _titleController,
-                      label: 'Expense Title',
-                      hint: 'e.g. Dinner, Taxi, Tickets',
-                      prefixIcon: Icons.receipt,
-                      validator: (value) =>
-                          AppValidators.validateRequiredText(value, 'Title'),
-                    ),
-                    const SizedBox(height: 16),
-                    AppTextField(
-                      controller: _amountController,
-                      label: 'Amount',
-                      hint: '0.00',
-                      prefixText: '${MoneyFormatter.getSymbol(
-                          currencyCode: hangout.defaultCurrency)} ',
-                      keyboardType: const TextInputType.numberWithOptions(
-                        decimal: true,
-                      ),
-                      validator: AppValidators.validateAmount,
-                    ),
-                  ],
-                ),
-              ),
-            ),
-
+            _buildTitleAndAmountCard(hangout),
             const SizedBox(height: 16),
-
-            // 2. Travel Mode / Currency
-            Card(
-              child: Padding(
-                padding: const EdgeInsets.all(16.0),
-                child: Column(
-                  children: [
-                    SwitchListTile(
-                      title: const Text('Foreign Currency (Travel Mode)'),
-                      value: _isTravelMode,
-                      onChanged: (val) => setState(() => _isTravelMode = val),
-                      contentPadding: EdgeInsets.zero,
-                    ),
-                    if (_isTravelMode) ...[
-                      const SizedBox(height: 16),
-                      DropdownButtonFormField<String>(
-                        decoration: const InputDecoration(
-                          labelText: 'Currency',
-                          border: OutlineInputBorder(),
-                          prefixIcon: Icon(Icons.public),
-                        ),
-                        initialValue: _selectedCurrency,
-                        items: CurrencyConstants.supportedCurrencies
-                            .map(
-                              (c) => DropdownMenuItem(value: c, child: Text(c)),
-                            )
-                            .toList(),
-                        onChanged: (val) {
-                          if (val != null) {
-                            setState(() => _selectedCurrency = val);
-                          }
-                        },
-                      ),
-                      const SizedBox(height: 16),
-                      Row(
-                        children: [
-                          Expanded(
-                            child: AppTextField(
-                              controller: _convertedAmountController,
-                              label:
-                                  'Converted Amount ($_selectedCurrency)',
-                              hint: '0.00',
-                              prefixIcon: Icons.currency_exchange,
-                              keyboardType:
-                                  const TextInputType.numberWithOptions(
-                                    decimal: true,
-                                  ),
-                            ),
-                          ),
-                          const SizedBox(width: 8),
-                          ElevatedButton(
-                            onPressed: _convertCurrency,
-                            child: const Text('Convert'),
-                          ),
-                        ],
-                      ),
-                      Consumer(
-                        builder: (context, ref, child) {
-                          final state = ref.watch(currencyProvider);
-                          if (state.status == CurrencyStateStatus.loading) {
-                            return const Padding(
-                              padding: EdgeInsets.only(top: 8.0),
-                              child: Center(child: CircularProgressIndicator()),
-                            );
-                          } else if (state.status ==
-                              CurrencyStateStatus.error) {
-                            return Padding(
-                              padding: const EdgeInsets.only(top: 8.0),
-                              child: Row(
-                                children: [
-                                  const Icon(
-                                    Icons.error,
-                                    color: Color(0xFFF59E0B),
-                                    size: 16,
-                                  ),
-                                  const SizedBox(width: 4),
-                                  Expanded(
-                                    child: Text(
-                                      state.errorMessage ?? 'API Error',
-                                      style: const TextStyle(
-                                        color: Color(0xFFF59E0B),
-                                        fontSize: 12,
-                                      ),
-                                    ),
-                                  ),
-                                  TextButton(
-                                    onPressed: _convertCurrency,
-                                    child: const Text('Retry'),
-                                  ),
-                                ],
-                              ),
-                            );
-                          }
-                          return const SizedBox.shrink();
-                        },
-                      ),
-                    ],
-                  ],
-                ),
-              ),
-            ),
-
+            _buildTravelModeCard(),
             const SizedBox(height: 16),
-
-            // 3. Payer & Participants
-            Card(
-              child: Padding(
-                padding: const EdgeInsets.all(16.0),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
-                    const Text(
-                      'Who paid?',
-                      style: TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    const SizedBox(height: 8),
-                    DropdownButtonFormField<String>(
-                      decoration: const InputDecoration(
-                        border: OutlineInputBorder(),
-                        prefixIcon: Icon(Icons.payment),
-                      ),
-                      hint: const Text('Select Payer'),
-                      initialValue: _selectedPayerId,
-                      items: hangoutPeople.map((person) {
-                        return DropdownMenuItem(
-                          value: person.id,
-                          child: Text(person.name),
-                        );
-                      }).toList(),
-                      onChanged: (val) {
-                        setState(() {
-                          _selectedPayerId = val;
-                        });
-                      },
-                      validator: (value) =>
-                          value == null ? 'Payer is required' : null,
-                    ),
-
-                    const SizedBox(height: 24),
-
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        const Text(
-                          'For whom?',
-                          style: TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                        Text(
-                          'Split Type: Equal',
-                          style: TextStyle(
-                            color: Theme.of(context).colorScheme.primary,
-                          ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 8),
-
-                    // Select All Checkbox
-                    CheckboxListTile(
-                      title: const Text(
-                        'Select All',
-                        style: TextStyle(fontWeight: FontWeight.bold),
-                      ),
-                      value:
-                          _selectedParticipantIds.length ==
-                          hangoutPeople.length,
-                      onChanged: (selected) {
-                        setState(() {
-                          if (selected == true) {
-                            _selectedParticipantIds.addAll(
-                              hangoutPeople.map((p) => p.id),
-                            );
-                          } else {
-                            _selectedParticipantIds.clear();
-                          }
-                        });
-                      },
-                      contentPadding: EdgeInsets.zero,
-                      controlAffinity: ListTileControlAffinity.leading,
-                      activeColor: Theme.of(context).colorScheme.primary,
-                    ),
-                    const Divider(),
-
-                    ...hangoutPeople.map((person) {
-                      return CheckboxListTile(
-                        title: Text(person.name),
-                        value: _selectedParticipantIds.contains(person.id),
-                        onChanged: (selected) {
-                          setState(() {
-                            if (selected == true) {
-                              _selectedParticipantIds.add(person.id);
-                            } else {
-                              _selectedParticipantIds.remove(person.id);
-                            }
-                          });
-                        },
-                        contentPadding: EdgeInsets.zero,
-                        controlAffinity: ListTileControlAffinity.leading,
-                      );
-                    }),
-                  ],
-                ),
-              ),
-            ),
-
+            _buildPayerAndParticipantsCard(hangoutPeople),
             const SizedBox(height: 16),
-
-            // 4. Note
-            Card(
-              child: Padding(
-                padding: const EdgeInsets.all(16.0),
-                child: AppTextField(
-                  controller: _noteController,
-                  label: 'Note (Optional)',
-                  hint: 'Any extra details?',
-                  prefixIcon: Icons.notes,
-                  maxLines: 3,
-                ),
-              ),
-            ),
+            _buildNoteCard(),
 
             const SizedBox(height: 24),
 
@@ -470,6 +223,245 @@ class _AddExpensesScreenState extends ConsumerState<AddExpensesScreen> {
             ),
             const SizedBox(height: 32),
           ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildTitleAndAmountCard(HangoutModel hangout) {
+    return Card(
+      child: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            AppTextField(
+              controller: _titleController,
+              label: 'Expense Title',
+              hint: 'e.g. Dinner, Taxi, Tickets',
+              prefixIcon: Icons.receipt,
+              validator: (value) =>
+                  AppValidators.validateRequiredText(value, 'Title'),
+            ),
+            const SizedBox(height: 16),
+            AppTextField(
+              controller: _amountController,
+              label: 'Amount',
+              hint: '0.00',
+              prefixText:
+                  '${MoneyFormatter.getSymbol(currencyCode: hangout.defaultCurrency)} ',
+              keyboardType: const TextInputType.numberWithOptions(
+                decimal: true,
+              ),
+              validator: AppValidators.validateAmount,
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildTravelModeCard() {
+    return Card(
+      child: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          children: [
+            SwitchListTile(
+              title: const Text('Foreign Currency (Travel Mode)'),
+              value: _isTravelMode,
+              onChanged: (val) => setState(() => _isTravelMode = val),
+              contentPadding: EdgeInsets.zero,
+            ),
+            if (_isTravelMode) ...[
+              const SizedBox(height: 16),
+              DropdownButtonFormField<String>(
+                decoration: const InputDecoration(
+                  labelText: 'Currency',
+                  border: OutlineInputBorder(),
+                  prefixIcon: Icon(Icons.public),
+                ),
+                initialValue: _selectedCurrency,
+                items: CurrencyConstants.supportedCurrencies
+                    .map((c) => DropdownMenuItem(value: c, child: Text(c)))
+                    .toList(),
+                onChanged: (val) {
+                  if (val != null) {
+                    setState(() => _selectedCurrency = val);
+                  }
+                },
+              ),
+              const SizedBox(height: 16),
+              Row(
+                children: [
+                  Expanded(
+                    child: AppTextField(
+                      controller: _convertedAmountController,
+                      label: 'Converted Amount ($_selectedCurrency)',
+                      hint: '0.00',
+                      prefixIcon: Icons.currency_exchange,
+                      keyboardType: const TextInputType.numberWithOptions(
+                        decimal: true,
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                  ElevatedButton(
+                    onPressed: _convertCurrency,
+                    child: const Text('Convert'),
+                  ),
+                ],
+              ),
+              Consumer(
+                builder: (context, ref, child) {
+                  final state = ref.watch(currencyProvider);
+                  if (state.status == CurrencyStateStatus.loading) {
+                    return const Padding(
+                      padding: EdgeInsets.only(top: 8.0),
+                      child: Center(child: CircularProgressIndicator()),
+                    );
+                  } else if (state.status == CurrencyStateStatus.error) {
+                    return Padding(
+                      padding: const EdgeInsets.only(top: 8.0),
+                      child: Row(
+                        children: [
+                          const Icon(
+                            Icons.error,
+                            color: Color(0xFFF59E0B),
+                            size: 16,
+                          ),
+                          const SizedBox(width: 4),
+                          Expanded(
+                            child: Text(
+                              state.errorMessage ?? 'API Error',
+                              style: const TextStyle(
+                                color: Color(0xFFF59E0B),
+                                fontSize: 12,
+                              ),
+                            ),
+                          ),
+                          TextButton(
+                            onPressed: _convertCurrency,
+                            child: const Text('Retry'),
+                          ),
+                        ],
+                      ),
+                    );
+                  }
+                  return const SizedBox.shrink();
+                },
+              ),
+            ],
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildPayerAndParticipantsCard(List<PersonModel> hangoutPeople) {
+    return Card(
+      child: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            const Text(
+              'Who paid?',
+              style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+            ),
+            const SizedBox(height: 8),
+            DropdownButtonFormField<String>(
+              decoration: const InputDecoration(
+                border: OutlineInputBorder(),
+                prefixIcon: Icon(Icons.payment),
+              ),
+              hint: const Text('Select Payer'),
+              initialValue: _selectedPayerId,
+              items: hangoutPeople.map<DropdownMenuItem<String>>((person) {
+                return DropdownMenuItem<String>(
+                  value: person.id,
+                  child: Text(person.name),
+                );
+              }).toList(),
+              onChanged: (val) {
+                setState(() {
+                  _selectedPayerId = val;
+                });
+              },
+              validator: (value) => value == null ? 'Payer is required' : null,
+            ),
+            const SizedBox(height: 24),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                const Text(
+                  'For whom?',
+                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                ),
+                Text(
+                  'Split Type: Equal',
+                  style: TextStyle(
+                    color: Theme.of(context).colorScheme.primary,
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 8),
+            CheckboxListTile(
+              title: const Text(
+                'Select All',
+                style: TextStyle(fontWeight: FontWeight.bold),
+              ),
+              value: _selectedParticipantIds.length == hangoutPeople.length,
+              onChanged: (selected) {
+                setState(() {
+                  if (selected == true) {
+                    _selectedParticipantIds.addAll(
+                      hangoutPeople.map((p) => p.id).cast<String>(),
+                    );
+                  } else {
+                    _selectedParticipantIds.clear();
+                  }
+                });
+              },
+              contentPadding: EdgeInsets.zero,
+              controlAffinity: ListTileControlAffinity.leading,
+              activeColor: Theme.of(context).colorScheme.primary,
+            ),
+            const Divider(),
+            ...hangoutPeople.map((person) {
+              return CheckboxListTile(
+                title: Text(person.name),
+                value: _selectedParticipantIds.contains(person.id),
+                onChanged: (selected) {
+                  setState(() {
+                    if (selected == true) {
+                      _selectedParticipantIds.add(person.id);
+                    } else {
+                      _selectedParticipantIds.remove(person.id);
+                    }
+                  });
+                },
+                contentPadding: EdgeInsets.zero,
+                controlAffinity: ListTileControlAffinity.leading,
+              );
+            }),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildNoteCard() {
+    return Card(
+      child: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: AppTextField(
+          controller: _noteController,
+          label: 'Note (Optional)',
+          hint: 'Any extra details?',
+          prefixIcon: Icons.notes,
+          maxLines: 3,
         ),
       ),
     );

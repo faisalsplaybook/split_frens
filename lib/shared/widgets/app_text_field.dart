@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 // ==========================================
 // Reusable Text Field
 // ==========================================
-// Creating our own custom Text Field means we don't have to rewrite 
+// Creating our own custom Text Field means we don't have to rewrite
 // the styling (like borders, padding, hints) every single time we need an input!
 class AppTextField extends StatelessWidget {
   final String label;

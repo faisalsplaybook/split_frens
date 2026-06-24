@@ -4,10 +4,10 @@ class HangoutModel {
   final String title;
   final DateTime startDate;
   final DateTime? endDate; // Optional, might be a one-day hangout
-  
+
   // Everyone part of this hangout
   final List<String> participantIds;
-  
+
   // All the expenses added to this hangout
   final List<String> expenseIds;
 
@@ -51,27 +51,28 @@ class HangoutModel {
   }
 
   Map<String, dynamic> toJson() => {
-        'id': id,
-        'title': title,
-        'startDate': startDate.toIso8601String(),
-        'endDate': endDate?.toIso8601String(),
-        'participantIds': participantIds,
-        'expenseIds': expenseIds,
-        'paidSettlementIds': paidSettlementIds,
-        'defaultCurrency': defaultCurrency,
-      };
+    'id': id,
+    'title': title,
+    'startDate': startDate.toIso8601String(),
+    'endDate': endDate?.toIso8601String(),
+    'participantIds': participantIds,
+    'expenseIds': expenseIds,
+    'paidSettlementIds': paidSettlementIds,
+    'defaultCurrency': defaultCurrency,
+  };
 
   factory HangoutModel.fromJson(Map<String, dynamic> json) => HangoutModel(
-        id: json['id'] as String,
-        title: json['title'] as String,
-        startDate: DateTime.parse(json['startDate'] as String),
-        endDate: json['endDate'] != null
-            ? DateTime.parse(json['endDate'] as String)
-            : null,
-        participantIds: List<String>.from(json['participantIds'] as List),
-        expenseIds: List<String>.from(json['expenseIds'] as List),
-        paidSettlementIds: List<String>.from(
-            json['paidSettlementIds'] as List? ?? []),
-        defaultCurrency: json['defaultCurrency'] as String?,
-      );
+    id: json['id'] as String,
+    title: json['title'] as String,
+    startDate: DateTime.parse(json['startDate'] as String),
+    endDate: json['endDate'] != null
+        ? DateTime.parse(json['endDate'] as String)
+        : null,
+    participantIds: List<String>.from(json['participantIds'] as List),
+    expenseIds: List<String>.from(json['expenseIds'] as List),
+    paidSettlementIds: List<String>.from(
+      json['paidSettlementIds'] as List? ?? [],
+    ),
+    defaultCurrency: json['defaultCurrency'] as String?,
+  );
 }

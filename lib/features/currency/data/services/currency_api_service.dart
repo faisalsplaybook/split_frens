@@ -12,20 +12,22 @@ class CurrencyApiService {
     required String toCurrency,
   }) async {
     try {
-      final response = await _dio.get('https://open.er-api.com/v6/latest/$fromCurrency');
-      
+      final response = await _dio.get(
+        'https://open.er-api.com/v6/latest/$fromCurrency',
+      );
+
       if (response.statusCode == 200) {
         final rates = response.data['rates'] as Map<String, dynamic>;
-        
+
         if (!rates.containsKey(toCurrency)) {
           throw Exception('Currency $toCurrency not supported');
         }
-        
+
         final rate = (rates[toCurrency] as num).toDouble();
         final lastUpdated = DateTime.fromMillisecondsSinceEpoch(
           (response.data['time_last_update_unix'] as int) * 1000,
         );
-        
+
         return CurrencyConversionResult(
           fromCurrency: fromCurrency,
           toCurrency: toCurrency,

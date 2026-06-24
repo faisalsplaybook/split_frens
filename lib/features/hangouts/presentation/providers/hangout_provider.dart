@@ -1,4 +1,3 @@
-
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../data/models/hangout_model.dart';
 import '../../data/services/local_storage_service.dart';
@@ -138,10 +137,9 @@ class HangoutsNotifier extends Notifier<List<HangoutModel>> {
     state = state.map((hangout) {
       if (hangout.id == hangoutId) {
         return hangout.copyWith(
-          paidSettlementIds:
-              hangout.paidSettlementIds
-                  .where((id) => id != settlementId)
-                  .toList(),
+          paidSettlementIds: hangout.paidSettlementIds
+              .where((id) => id != settlementId)
+              .toList(),
         );
       }
       return hangout;
