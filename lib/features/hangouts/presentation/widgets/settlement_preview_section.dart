@@ -1,8 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:share_plus/share_plus.dart';
-
 import '../../../../core/utils/money_formatter.dart';
-import '../../../../core/utils/summary_generator.dart';
 import '../../data/models/expense_model.dart';
 import '../../data/models/hangout_model.dart';
 import '../../data/models/person_model.dart';
@@ -129,45 +126,6 @@ class SettlementPreviewSection extends StatelessWidget {
             );
           }),
 
-        const SizedBox(height: 32),
-
-        // Share Final Split button
-        Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 16.0),
-          child: OutlinedButton.icon(
-            onPressed: () {
-              if (hangout.expenseIds.isEmpty) {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(
-                    content: Text('Add expenses before sharing a summary.'),
-                  ),
-                );
-                return;
-              }
-
-              final hangoutPeople = allPeople
-                  .where((p) => hangout.participantIds.contains(p.id))
-                  .toList();
-              final hangoutExpenses = allExpenses
-                  .where((e) => hangout.expenseIds.contains(e.id))
-                  .toList();
-
-              final summary = SummaryGenerator.generateSummary(
-                hangout: hangout,
-                expenses: hangoutExpenses,
-                people: hangoutPeople,
-                settlements: settlements,
-                totalExpense: totalSpent,
-                calculator: calculator,
-              );
-
-              // ignore: deprecated_member_use
-              Share.share(summary);
-            },
-            icon: const Icon(Icons.share),
-            label: const Text('Share Final Split'),
-          ),
-        ),
       ],
     );
   }
