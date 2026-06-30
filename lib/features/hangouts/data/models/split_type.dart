@@ -1,5 +1,4 @@
 /// Defines the different ways an expense can be split among friends.
-/// We use an 'enum' (enumeration) to define a fixed set of options.
 enum SplitType {
   /// Split the cost equally among everyone (e.g., $30 divided by 3 people = $10 each).
   equal,

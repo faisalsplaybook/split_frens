@@ -1,15 +1,9 @@
 import 'package:flutter/material.dart';
 
-// ==========================================
-// Reusable Text Field
-// ==========================================
-// Creating our own custom Text Field means we don't have to rewrite
-// the styling (like borders, padding, hints) every single time we need an input!
 class AppTextField extends StatelessWidget {
   final String label;
   final String? hint;
   final TextEditingController? controller;
-  // This takes a function that returns a String? (the error message)
   final String? Function(String?)? validator;
   final TextInputType keyboardType;
   final int maxLines;
@@ -30,8 +24,6 @@ class AppTextField extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // TextFormField is the standard Flutter widget for forms because
-    // it automatically connects to the surrounding Form widget for validation.
     return Padding(
       padding: const EdgeInsets.only(bottom: 16.0),
       child: Column(
@@ -53,7 +45,6 @@ class AppTextField extends StatelessWidget {
             validator: validator,
             keyboardType: keyboardType,
             maxLines: maxLines,
-            // The decoration determines how the field looks
             decoration: InputDecoration(
               hintText: hint,
               prefixIcon: prefixIcon != null ? Icon(prefixIcon) : null,

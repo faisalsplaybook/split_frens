@@ -1,10 +1,5 @@
 import 'package:flutter/material.dart';
 
-// ==========================================
-// Reusable Dropdown Field
-// ==========================================
-// Similar to AppTextField, this standardizes how dropdowns look across our app.
-// The 'T' means this is a Generic class — it can hold Strings, Enums, or any object!
 class AppDropdown<T> extends StatelessWidget {
   final String label;
   final T? value;

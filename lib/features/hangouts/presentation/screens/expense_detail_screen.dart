@@ -89,8 +89,7 @@ class ExpenseDetailScreen extends ConsumerWidget {
           IconButton(
             icon: const Icon(Icons.delete, color: Color(0xFFF59E0B)),
             onPressed: () {
-              // MVP deletion (optional, not specifically requested but good UX)
-              // Just a placeholder snackbar for now
+              // Deletion isn't implemented yet.
               ScaffoldMessenger.of(context).showSnackBar(
                 const SnackBar(content: Text('Delete not implemented yet')),
               );

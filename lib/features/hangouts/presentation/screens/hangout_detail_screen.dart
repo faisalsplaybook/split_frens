@@ -24,18 +24,15 @@ class HangoutDetailScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    // 1. Get the lists of data
     final hangouts = ref.watch(hangoutsProvider);
     final allExpenses = ref.watch(expensesProvider);
-    // We use a simple loop or firstWhere to find it safely
     HangoutModel? hangout;
     try {
       hangout = hangouts.firstWhere((h) => h.id == hangoutId);
     } catch (e) {
-      hangout = null; // firstWhere throws an error if no match is found
+      hangout = null;
     }
 
-    // 3. Error State (If the hangout doesn't exist)
     if (hangout == null) {
       return Scaffold(
         appBar: AppBar(title: const Text('Error')),
@@ -65,25 +62,15 @@ class HangoutDetailScreen extends ConsumerWidget {
       );
     }
 
-    // 4. Normal State (If the hangout exists)
-
-    // Calculate Summary Data
     final calculator = SplitCalculatorService(allExpenses: allExpenses);
     final totalSpent = calculator.calculateTotalSpent(hangout);
     final settlements = calculator.generateSettlements(hangout);
 
     return Scaffold(
-      appBar: AppBar(
-        // We use the actual title of the hangout instead of the raw ID!
-        title: Text(hangout.title),
-      ),
-      // We use a ListView so the screen can scroll if we have many expenses
+      appBar: AppBar(title: Text(hangout.title)),
       body: ListView(
         padding: const EdgeInsets.all(16.0),
         children: [
-          // ==========================================
-          // 1. Core Action Buttons
-          // ==========================================
           Wrap(
             spacing: 8, // Space between buttons horizontally
             runSpacing: 8, // Space between buttons vertically if they wrap

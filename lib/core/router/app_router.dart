@@ -1,11 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
-// ==========================================
-// 1. Imports
-// ==========================================
-// We must import all the screens we want our router to know about.
-// Notice how they are cleanly separated by feature folders!
 import '../../features/splash/presentation/screens/splash_screen.dart';
 import '../../screens/home_screen.dart';
 

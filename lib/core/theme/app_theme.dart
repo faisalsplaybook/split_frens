@@ -2,8 +2,6 @@ import 'package:flutter/material.dart';
 
 /// AppTheme defines the visual styling for the entire application.
 class AppTheme {
-  /// Private constructor to prevent instantiation.
-  /// We only use static methods here since we don't need to create an object of AppTheme.
   AppTheme._();
 
   /// Returns the dark theme configuration for the app.

@@ -25,11 +25,9 @@ class HangoutCard extends ConsumerWidget {
       currencyCode: hangout.defaultCurrency,
     );
 
-    // Determine settlement status based on the hangout's paidSettlementIds
-    // We can't run the full settlement calc here without a circular dependency,
-    // so we check if any settlements exist by seeing if the hangout has expenses.
-    // A simple heuristic: if all settlement IDs are paid, it's settled.
-    // For now we just show Settled vs Unsettled.
+    // Settled vs unsettled is derived from paidSettlementIds rather than a
+    // dedicated provider, to avoid a circular dependency between hangouts
+    // and the settlement calculator.
     final allSettlements = calculator.generateSettlements(hangout);
     final unpaidCount = allSettlements
         .where((s) => !hangout.paidSettlementIds.contains(s.id))

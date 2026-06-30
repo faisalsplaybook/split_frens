@@ -14,7 +14,7 @@ class HangoutsNotifier extends Notifier<List<HangoutModel>> {
   }
 
   void _save() {
-    // Because we need to save all 3 lists at once to maintain normalized integrity
+    // All 3 lists are saved together to keep the normalized data consistent.
     LocalStorageService.saveAllData(
       hangouts: state,
       persons: ref.read(personsProvider),
@@ -148,11 +148,6 @@ class HangoutsNotifier extends Notifier<List<HangoutModel>> {
   }
 }
 
-// ==========================================
-// 2. Defining the Provider
-// ==========================================
-// We expose our Notifier to the rest of the app using a NotifierProvider.
-// Any widget can read or watch this provider to get the current list of hangouts!
 final hangoutsProvider = NotifierProvider<HangoutsNotifier, List<HangoutModel>>(
   () {
     return HangoutsNotifier();

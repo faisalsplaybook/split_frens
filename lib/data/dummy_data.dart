@@ -3,13 +3,7 @@ import '../features/hangouts/data/models/hangout_model.dart';
 import '../features/hangouts/data/models/person_model.dart';
 import '../features/hangouts/data/models/split_type.dart';
 
-/// This class holds our dummy data for testing the UI before we connect a real database.
-/// We use 'static final' so we can access these lists anywhere in the app
-/// simply by calling DummyData.allPeople, without having to create an object of DummyData.
 class DummyData {
-  // ==========================================
-  // 1. Create the People (Friends)
-  // ==========================================
   static final PersonModel faisal = PersonModel(id: 'p1', name: 'Faisal');
   static final PersonModel rafi = PersonModel(id: 'p2', name: 'Rafi');
   static final PersonModel nabil = PersonModel(id: 'p3', name: 'Nabil');

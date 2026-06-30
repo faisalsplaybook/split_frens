@@ -100,22 +100,17 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                 foregroundColor: Theme.of(context).colorScheme.onError,
               ),
               onPressed: () async {
-                // 1. Wipe the database
                 await HangoutRepository().clearAll();
-
-                // 2. Clear all providers in memory (which will auto-save empty lists)
                 ref.read(hangoutsProvider.notifier).clearAllHangouts();
 
-                // We don't explicitly have clearAll on persons/expenses yet,
-                // but wiping hangouts is the core structure.
-                // To be completely clean, let's force a reload.
-                // In Riverpod, we can invalidate to force them to re-run their build().
+                // persons/expenses have no dedicated clearAll yet; invalidating
+                // forces their providers to rebuild against the now-empty store.
                 ref.invalidate(hangoutsProvider);
                 ref.invalidate(personsProvider);
                 ref.invalidate(expensesProvider);
 
                 if (context.mounted) {
-                  Navigator.pop(context); // Close dialog
+                  Navigator.pop(context);
                   ScaffoldMessenger.of(context).showSnackBar(
                     const SnackBar(content: Text('All local data cleared.')),
                   );
